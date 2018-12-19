@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{26A319E0-CD48-48DB-93B4-8048403051F4}</ProjectGuid>
-    <RootNamespace>My001</RootNamespace>
+    <ProjectGuid>{17E00DA3-A90F-45D3-9485-E04C4FB3FC2F}</ProjectGuid>
+    <RootNamespace>RedContritioStandard</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -115,6 +115,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BufferLayer.h" />
+    <ClInclude Include="LogSpawner.h" />
+    <ClInclude Include="StandardWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BufferLayer.cpp" />
+    <ClCompile Include="LogSpawner.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="StandardWindow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
