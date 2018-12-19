@@ -1,0 +1,44 @@
+#ifndef __DEFINES__DEF
+#define __DEFINES__DEF
+
+#define	PI 3.14159265358979
+#define G 0.0000667
+#define dvScale 0.01
+#define dtScale 1000
+#define EPSILON STAR__DEFAULT__RADIUS
+
+#define RGB_White (RGB(0xFF ,0xFF ,0xFF ))
+#define RGB_Red (RGB(0xFF ,0 ,0 ))
+#define RGB_OrangeMadder (RGB(0xFF ,0x45 ,0 ))
+#define RGB_Yellow (RGB(0xFF ,0xFF ,0 ))
+#define RGB_GRAY (RGB(0x80 ,0x80 ,0x80 ))
+#define RGB_SlateBlue (RGB(0x6A ,0x5A ,0xCD ))
+#define RGB_DarkSlateBlue (RGB(0x48 ,0x3D ,0x8B ))
+
+#define STAR__DEFAULT__MASS 10000000
+#define STAR__DEFAULT__RADIUS 10
+#define STAR__DEFAULT__COLOR RGB_OrangeMadder
+
+#define PLANET__DEFAULT__MASS 50
+#define PLANET__DEFAULT__RADIUS 4
+#define PLANET__DEFAULT__COLOR RGB_DarkSlateBlue
+#define PLANET__DEFAULT__MAXIMUM 30
+#define PLANET__DEFAULT__SPAWN__VELOCITY__SCALE 0.01
+
+#define ORBIT__DEFAULT__COLOR RGB_DarkSlateBlue 
+#define ORBIT__DEFAULT__MINIMUM__DISTANCE (4*PLANET__DEFAULT__RADIUS )
+#define ORBIT__DEFAULT__SLOW__SCALE 0.1
+
+#define CONTRAIL__DEFAULT__MAX__LIFE 0xFF
+#define CONTRAIL__DEFAULT__COLOR PLANET__DEFAULT__COLOR
+#define CONTRAIL__DEFAULT__INTERVAL 3
+
+#define BOMB__DEFAULT__RADIUS (3*PLANET__DEFAULT__RADIUS )
+#define BOMB__DEFAULT__LIFE 0x3FF
+#define BOMB__DEFAULT__PARTICLE__NUM 30
+#define BOME__DEFAULT__PARTICLE__MAX__VELOCITY 0.07
+
+typedef DWORD __MBS__TYPE ;
+#define __MBS__TYPE__STAR 0x00000001
+#define __MBS__TYPE__PLANET 0x00000002
+#endif
