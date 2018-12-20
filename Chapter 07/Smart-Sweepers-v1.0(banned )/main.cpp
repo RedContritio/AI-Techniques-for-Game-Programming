@@ -1,78 +1,67 @@
 #include <windows.h>
-#include "BufferLayer.h"
-#include "StandardWindow.h"
-#include "LogSpawner.h"
-#include "CTimer.h"
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 
-#include "S2DMatrix.h"
-#include "S2DVector.h"
 
-#include "CController.h"
-#include "CStar.h"
+#include "BufferLayer.h"
+#include "StandardWindow.h"
+#include "LogSpawner.h"
+#include "CTimer.h"
 
 using RedContritio::BUFFERLAYER ;
-using RedContritio::LOGSPAWNER ;
 using RedContritio::InitializeWindowClass ;
 using RedContritio::CreateVisibleWindow ;
+using RedContritio::LogSpawner ;
+using RedContritio::Timer ;
 
-const char* MainClassName = "RedContritio Test SS Project v1.0" ;
+#include "utils.hpp"
+#include "CParams.h"
+#include "CController.h"
+
+const char* MainClassName = "RedContritio Test ANN-SS Project" ;
 const char* MainTitleName = "Smart Sweepers" ;
 BUFFERLAYER BackBuffer ;
 int cxClient ,cyClient ;
 int pxMouse ,pyMouse ;
 static void GetClientArguments(HWND );
 
-LOGSPAWNER loger ;
+LogSpawner loger ;
 
-CONTROLLER* pController = NULL ;
+PARAMETERASSIST __HiddenParameterAssist ;
+
+CPARAMETERS GlobalParameters ;
+
+CCONTROLLER *pController ;
 
 LRESULT CALLBACK WindowProc(HWND ,UINT ,WPARAM ,LPARAM );
 
 int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,
 				   LPSTR lpCmdLine ,int nShowCmd )
 {
-	loger.lprint("Application Started\n" );
-	/*
-	{
-		time_t seed = time(NULL );
-		srand((unsigned int)seed );
-		loger.lprint("seed = %d\n",seed );
-	}
-	*/
-	/*
-	if(AllocConsole())
-	{
-		freopen("CONOUT$","w",stdout);
-	}//Open Console
-	*/
+	loger.printf("Application Started\n" );
 
 	WNDCLASSEX winClass ;
 	InitializeWindowClass(&winClass ,WindowProc ,hInstance ,MainClassName );
 
 	if(!RegisterClassEx(&winClass ))
 	{
-		MessageBox(NULL ,"Window Registration Failed" ,"Error" ,MB_OK );
+		loger.printf("Window Registration Failed\n" );
 		return 0 ;
 	}
-	HWND hwnd = CreateVisibleWindow(MainClassName ,MainTitleName ,640 ,480 ,hInstance );
+	HWND hwnd = CreateVisibleWindow(MainClassName ,MainTitleName ,CPARAMETERS::WindowWidth ,CPARAMETERS::WindowHeight ,hInstance );
 	if(!hwnd )
 	{
-		MessageBox(NULL ,"Window Creation Failed" ,"Error" ,MB_OK );
+		loger.printf("Window Creation Failed\n" );
 		return 0 ;
 	}
 	ShowWindow(hwnd ,nShowCmd );
 	UpdateWindow(hwnd );
-
-	loger.lprint("Window Creation Succeeded\n" );
+	
+	loger.printf("Window Creation Succeeded\n" );
 
 	bool EndFlag = false ;
-#ifndef FRAMES__PER__SECOND
-	#define FRAMES__PER__SECOND 60
-#endif
-	CTimer timer(FRAMES__PER__SECOND );
+	Timer timer(CPARAMETERS::FramesPerSecond );
 	MSG msg ;
 	while(!EndFlag )
 	{
@@ -82,19 +71,16 @@ int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,
 			{
 				EndFlag = true ;
 			}
-			else
-			{
-				TranslateMessage(&msg );
-				DispatchMessage(&msg );
-			}
+			TranslateMessage(&msg );
+			DispatchMessage(&msg );
 		}
 
 		
-		if(timer.ReadyForNextFrame() )
+		if(timer.ReadyForNextFrame() || pController->FaseRender() )
 		{
-			if(pController )
+			if(!(pController->Update()))
 			{
-				pController->Update(timer.TimeElapsed());
+				EndFlag = true ;
 			}
 			InvalidateRect(hwnd, NULL, true);
 			UpdateWindow(hwnd);
@@ -104,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,
 
 	UnregisterClass(MainClassName ,winClass.hInstance );
 	
-	loger.lprint("Application Quited\n" );
+	loger.printf("Application Quited\n" );
 	return 0 ;
 }
 
@@ -117,7 +103,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 			srand((unsigned)time(NULL ));
 			GetClientArguments(hwnd );
 			BackBuffer.ResetBufferLayer(hwnd );
-			pController = new CONTROLLER();
+			pController = new CCONTROLLER();
 			break ;
 		}
 		case WM_PAINT :
@@ -125,12 +111,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 			PAINTSTRUCT ps ;
 			BeginPaint(hwnd ,&ps );
 
-			BitBlt(BackBuffer.GetHdc( ),0 ,0 ,cxClient ,cyClient ,NULL ,0 ,0 ,BLACKNESS );
+			BitBlt(BackBuffer.GetHdc( ),0 ,0 ,cxClient ,cyClient ,NULL ,0 ,0 ,WHITENESS );
 
-			if(pController )
-			{
-				pController->Render(BackBuffer.GetHdc());
-			}
+			pController->Render(BackBuffer.GetHdc() ) ;
 
 			BitBlt(ps.hdc ,0 ,0 ,cxClient ,cyClient ,BackBuffer.GetHdc( ),0 ,0 ,SRCCOPY );
 
@@ -143,21 +126,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 			{
 				case 'R' :
 				{
-					delete pController ;
-					pController = new CONTROLLER() ;
-					break ;
-				}
-				case 'V' :
-				{
-					pController->Watch();
-					break ;
-				}
-				case 'P' :
-				{
 					if(pController )
 					{
-						pController->Pause();
+						delete pController ;
 					}
+					pController = new CCONTROLLER();
+					break ;
+				}
+				case 'F' :
+				{
+					pController->FaseRenderToggle();
 					break ;
 				}
 				case VK_RETURN :
@@ -191,50 +169,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 		{
 			int x = LOWORD(lParam );
 			int y = HIWORD(lParam );
-			if(pController )
-			{
-				pController->LButtonDown(x ,y );
-			}
+
 			break ;
 		}
 		case WM_LBUTTONUP :
 		{
 			int x = LOWORD(lParam );
 			int y = HIWORD(lParam );
-			if(pController )
-			{
-				pController->LButtonUp(x ,y );
-			}
+
 			break ;
 		}
 		case WM_RBUTTONDOWN :
 		{
 			int x = LOWORD(lParam);
 			int y = HIWORD(lParam);
-			if(pController )
-			{
-				pController->RButtonDown(x ,y );
-			}
+
 			break ;
 		}
 		case WM_RBUTTONUP :
 		{
 			int x = LOWORD(lParam);
 			int y = HIWORD(lParam);
-			if(pController )
-			{
-				pController->RButtonUp(x ,y );
-			}
+			;
 			break ;
 		}
 		case WM_MOUSEMOVE :
 		{
 			pxMouse = LOWORD(lParam );
 			pyMouse = HIWORD(lParam );
-			if(pController )
-			{
-				pController->MouseMove(pxMouse ,pyMouse );
-			}
+			;
 			break ;
 		}
 		case WM_COMMAND :
@@ -245,6 +208,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 		{
 			BackBuffer.DeleteBufferLayer( );
 			PostQuitMessage(0 );
+			if(pController )
+			{
+				delete pController ;
+			}
 			break ;
 		}
 	}
@@ -256,6 +223,6 @@ static inline void GetClientArguments(HWND hwnd )
 {
 	RECT rect ;
 	GetClientRect(hwnd ,&rect );
-	cxClient = rect.right ;
-	cyClient = rect.bottom ;
+	CPARAMETERS::WindowWidth = cxClient = rect.right ;
+	CPARAMETERS::WindowHeight = cyClient = rect.bottom ;
 }
