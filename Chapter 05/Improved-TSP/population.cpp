@@ -39,7 +39,7 @@ vector<int> GENOME::GetRoute(void )
 void RouteRenderer(HDC hdc,const MAP &map ,const vector<int> &route )
 {
 	MoveToEx(hdc ,__RR__GetX(route.size()-1) ,__RR__GetY(route.size()-1) ,NULL );
-	for(int i=0 ;i<route.size() ;i++ )
+	for(int i=0 ;i<(int)(route.size()) ;i++ )
 	{
 		LineTo(hdc ,__RR__GetX(i) ,__RR__GetY(i) );
 	}
@@ -127,7 +127,7 @@ void POPULATION::Epoch(void )
 	{
 		vecNextGeneration.push_back(vecGenomes[FittestGenome] );
 	}
-	while(vecNextGeneration.size() < PopulationSize )
+	while((int)(vecNextGeneration.size()) < PopulationSize )
 	{
 		GENOME parent1 = SelectParent(vecGenomes ,TotalFitness );
 		GENOME parent2 = SelectParent(vecGenomes ,TotalFitness );
@@ -316,19 +316,19 @@ void CrossoverOBX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 	vector<int> tmpCities ;
 	{
 		int pos = RandInt(0 ,parent1.size()-2 );
-		while(pos < parent1.size() )
+		while(pos < (int)(parent1.size()) )
 		{
 			Positions.push_back(pos );
 			pos = RandInt(pos+1 ,parent1.size() );
 		}
-		for(int i=0 ;i<Positions.size() ;i++ )
+		for(int i=0 ;i<(int)(Positions.size()) ;i++ )
 		{
 			tmpCities[i] = parent1[Positions[i]] ;
 		}
 	}
 	int i = 0 , j = 0 ; // fuck VC++
 	int k = 0 ;
-	for(i=0 ;i<parent2.size() ;i++ )
+	for(i=0 ;i<(int)(parent2.size()) ;i++ )
 	{
 		std::vector<int>::iterator it = std::find(tmpCities.begin() ,tmpCities.end() ,parent2[k] );
 		if( it != tmpCities.end() )
@@ -340,13 +340,13 @@ void CrossoverOBX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 	tmpCities.clear() ;
 	k = 0 ;
 	{
-		for(int i=0 ;i<Positions.size() ;i++ )
+		for(int i=0 ;i<(int)(Positions.size()) ;i++ )
 		{
 			tmpCities[i] = parent2[Positions[i]] ;
 		}
 	}
 
-	for(i=0 ;i<parent2.size() ;i++ )
+	for(i=0 ;i<(int)(parent2.size()) ;i++ )
 	{
 		std::vector<int>::iterator it = std::find(tmpCities.begin() ,tmpCities.end() ,parent1[k] );
 		if( it != tmpCities.end() )
@@ -364,7 +364,7 @@ void CrossoverPBX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 	vector<int> tmpCities ;
 	{
 		int pos = RandInt(0 ,parent1.size()-2 );
-		while(pos < parent1.size() )
+		while(pos < (int)(parent1.size()) )
 		{
 			Positions.push_back(pos );
 			pos = RandInt(pos+1 ,parent1.size() );
@@ -374,7 +374,7 @@ void CrossoverPBX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 	int k = 0 ;
 	{
 		child1.clear( );
-		for(i=0 ;i<parent2.size() ;i++ )
+		for(i=0 ;i<(int)(parent2.size()) ;i++ )
 		{
 			std::vector<int>::iterator it = std::find(Positions.begin() ,Positions.end() ,i );
 			if( it == Positions.end( )) // not exist
@@ -394,7 +394,7 @@ void CrossoverPBX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 	k = 0 ;
 	{
 		child2.clear( );
-		for(i=0 ;i<parent1.size() ;i++ )
+		for(i=0 ;i<(int)(parent1.size()) ;i++ )
 		{
 			std::vector<int>::iterator it = std::find(Positions.begin() ,Positions.end() ,i );
 			if( it == Positions.end() ) // not exist
@@ -418,14 +418,14 @@ void CrossoverPMX(const vector<int> &parent1 ,const vector<int> &parent2 ,
 {
 	vector<int> map ;
 	int i ; // fuck VC++
-	for(i=0 ;i<parent1.size() ;i++ )map[i] = i ;
+	for(i=0 ;i<(int)(parent1.size()) ;i++ )map[i] = i ;
 	int p1 = RandInt(0 ,parent1.size() );
 	int p2 = RandInt(p1+1 ,parent1.size() );
 	for(i=p1 ;i<=p2 ;i++ )
 	{
 		swap(map[parent1[i]] ,map[parent2[i]] ) ;
 	}
-	for(i=0 ;i<child1.size() ;i++ )
+	for(i=0 ;i<(int)(child1.size()) ;i++ )
 	{
 		child1[i] = map[child1[i]] ;
 		child2[i] = map[child2[i]] ;
@@ -445,7 +445,7 @@ GENOME& RouletteWheelSelection(vector<GENOME> &vecGenomes ,double TotalFitness )
 {
 	double NeedFitness = RandFloat() * TotalFitness ;
 	double NowFitness = 0 ;
-	for(int i=0 ;i<vecGenomes.size() ;i++ )
+	for(int i=0 ;i<(int)(vecGenomes.size()) ;i++ )
 	{
 		NowFitness += vecGenomes[i].Fitness();
 		if(NowFitness >= NeedFitness )return vecGenomes[i] ;

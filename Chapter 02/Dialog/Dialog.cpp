@@ -29,7 +29,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,
 BOOL CALLBACK DialogProc(HWND hwnd ,UINT msg ,
 						 WPARAM wParam ,LPARAM lParam );
 
-int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,LPSTR lpCmdLine ,int nShowCmd )
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	srand(( unsigned)time(0 ));
 	WNDCLASSEX wc ;
@@ -60,11 +61,11 @@ int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,LPSTR lpCmdLine
 		}
 		
 		
-		while(Balls.size() > NumOfBalls )Balls.pop_back();
-		while(Balls.size() < NumOfBalls )
+		while((int)(Balls.size()) > NumOfBalls )Balls.pop_back();
+		while((int)(Balls.size()) < NumOfBalls )
 		{
 			BALL temp ;
-			temp.Reset(cxClient ,cyClient );
+			temp.Reset((float)cxClient ,(float)cyClient );
 			Balls.push_back(temp );
 		}
 		for(std::vector<BALL>::iterator itor = Balls.begin() ;itor != Balls.end() ;itor ++ )
@@ -184,15 +185,15 @@ BOOL CALLBACK DialogProc(HWND hwnd ,UINT msg ,
 
 void Simulate(BALL &ball)
 {
-	if( ball.px+RadiusOfBalls > cxClient && ball.vx > 0 )ball.vx = -ball.vx ;
-	if( ball.px-RadiusOfBalls < 0 && ball.vx < 0 )ball.vx = -ball.vx ;
-	if( ball.py+RadiusOfBalls > cyClient && ball.vy > 0 )ball.vy = -ball.vy ;
-	if( ball.py+RadiusOfBalls < cyClient )ball.Accelate(0 ,0.005 );
+	if( ball.m_px+RadiusOfBalls > cxClient && ball.m_vx > 0 )ball.m_vx = -ball.m_vx ;
+	if( ball.m_px-RadiusOfBalls < 0 && ball.m_vx < 0 )ball.m_vx = -ball.m_vx ;
+	if( ball.m_py+RadiusOfBalls > cyClient && ball.m_vy > 0 )ball.m_vy = -ball.m_vy ;
+	if( ball.m_py+RadiusOfBalls < cyClient )ball.Accelate(0 ,0.005f );
 	ball.Move() ;
 }
 
 void DrawBall(HDC hdc ,BALL &ball )
 {
-	Ellipse(hdc ,ball.px - RadiusOfBalls ,ball.py - RadiusOfBalls ,
-				 ball.px + RadiusOfBalls ,ball.py + RadiusOfBalls );
+	Ellipse(hdc ,(int)(ball.m_px - RadiusOfBalls) , (int)(ball.m_py - RadiusOfBalls),
+		(int)(ball.m_px + RadiusOfBalls), (int)(ball.m_py + RadiusOfBalls));
 }

@@ -91,7 +91,7 @@ void CLander::Render(HDC &hdc )
 		vecJetVBTrans = vecJetVB ;
 		WorldTransform(vecJetVBTrans );
 		MoveToEx(hdc ,(int)vecJetVBTrans[0].x ,(int)vecJetVBTrans[0].y ,NULL );
-		for(i=1 ;i<vecJetVBTrans.size() ;i++ )
+		for(i=1 ;i<(int)(vecJetVBTrans.size()) ;i++ )
 		{
 			LineTo(hdc ,(int)vecJetVBTrans[i].x ,(int)vecJetVBTrans[i].y );
 		}
@@ -117,7 +117,7 @@ void CLander::Render(HDC &hdc )
 
 void CLander::Reset(S2DVector &_padpos )
 {
-	pos = S2DVector(cxClient/2 ,cyClient-50 );
+	pos = S2DVector(cxClient/2 ,cyClient-50.0 );
 	angle = PI ;
 	velocity = S2DVector(0 ,0 );
 	PadPos = _padpos ;
@@ -203,7 +203,7 @@ void CLander::WorldTransform(vector<SPoint> &vecPoints )
 		TransMatrix *= MoveMatrix ;
 	}
 
-	for(int i=0 ;i<vecPoints.size() ;i++ )
+	for(int i=0 ;i<(int)(vecPoints.size()) ;i++ )
 	{
 		C2DMATRIX tmp(vecPoints[i].x ,vecPoints[i].y );
 		tmp *= TransMatrix ;
@@ -216,7 +216,7 @@ void CLander::WorldTransform(vector<SPoint> &vecPoints )
 bool CLander::TestForImpact(vector<SPoint> &points )
 {
 	const int GroundLevel = 50 + 5 ;
-	for(int i=0 ;i<points.size() ;i++ )
+	for(int i=0 ;i<(int)(points.size()) ;i++ )
 	{
 		if(points[i].y < GroundLevel )
 		{

@@ -39,10 +39,10 @@ void GUN::WorldTransform(void )
 void GUN::Render(HDC hdc )
 {
 	WorldTransform( );
-	MoveToEx(hdc ,vecGunVBTrans[NumGunVerts-1].x ,vecGunVBTrans[NumGunVerts-1].y ,NULL );
+	MoveToEx(hdc, (int)(vecGunVBTrans[NumGunVerts-1].x), (int)(vecGunVBTrans[NumGunVerts-1].y), NULL);
 	for(int i=0 ;i<NumGunVerts ;i++ )
 	{
-		LineTo(hdc ,vecGunVBTrans[i].x ,vecGunVBTrans[i].y );
+		LineTo(hdc , (int)(vecGunVBTrans[i].x), (int)(vecGunVBTrans[i].y));
 	}
 	char sdPos[20] ;
 	sprintf(sdPos ,"dPosition : (%g ,%g )" ,dPos.x ,dPos.y );

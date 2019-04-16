@@ -90,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,
 		
 		if(timer.ReadyForNextFrame() )
 		{
-			if(!(pController->Update(timer.GetTimeElapsed())) )
+			if(!(pController && pController->Update(timer.GetTimeElapsed())) )
 			{
 				EndFlag = true ;
 			}
@@ -112,7 +112,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 	{
 		case WM_CREATE :
 		{
-			srand(time(NULL ));
+			srand((unsigned)time(NULL ));
 			GetClientArguments(hwnd );
 			BackBuffer.ResetBufferLayer(hwnd );
 			pController = new CController() ;
@@ -181,6 +181,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 			if(pController )
 			{
 				delete pController ;
+				pController = NULL;
 			}
 			break ;
 		}

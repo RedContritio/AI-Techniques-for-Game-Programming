@@ -16,8 +16,8 @@ void MAP::CreateCitiesCircular(void )
 	const int margin = 50 ;
 	double Radius ;
 	int LengthLimitation = min(MapWidth ,MapHeight );
-	Radius = (LengthLimitation /2 ) -margin ;
-	R_COORD origin(MapWidth /2 ,MapHeight /2 );
+	Radius = (LengthLimitation /2.0 ) - margin ;
+	R_COORD origin((float)(MapWidth /2) , (float)(MapHeight /2));
 }
 
 double MAP::CalculateDistance(const R_COORD &A ,const R_COORD &B )

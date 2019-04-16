@@ -26,7 +26,7 @@ double MAP::TestRoute(const vector<int> &vecPath ,MAP &player )
 	int PosX = StartX ,PosY = StartY ;
 	
 	//printf("Testing : ");
-	for(int i=0 ;i<vecPath.size() ;i++ )
+	for(int i=0 ;i<(int)(vecPath.size()) ;i++ )
 	{
 		//printf("(%d ,%d) ," ,PosX ,PosY );
 		switch(vecPath[i] )

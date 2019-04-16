@@ -10,7 +10,7 @@ const SPoint PadShape[NumPadVerts] = {SPoint(-20 ,0 ),
 
 CController::CController(void ):Succeeded(false ),PadPos(S2DVector(RandFloat() * cxClient ,50 ))
 {
-	S2DVector vStartPos(cxClient/2 ,cyClient-50 );
+	S2DVector vStartPos( 0.5*cxClient, cyClient - 50.0);
 	lander = new CLander(vStartPos ,PadPos ,PI );
 	int i ;
 	for(i=0 ;i<NumPadVerts ;i++ )
@@ -39,7 +39,7 @@ bool CController::Update(double TimeElapsed )
 
 void CController::NewRun(void )
 {
-	PadPos = S2DVector(50+RandFloat()*(cxClient-100 ),50 );
+	PadPos = S2DVector(50.0 + RandFloat() * (cxClient-100.0) ,50.0);
 	lander->Reset(PadPos );
 	return ;
 }
@@ -57,7 +57,7 @@ void CController::Render(HDC& hdc )
 	{
 		if(RandFloat() > 0.05 )
 		{
-			SetPixel(hdc ,vecStarsVB[i].x ,vecStarsVB[i].y ,RGB(255 ,255 ,255 ));
+			SetPixel(hdc , (int)(vecStarsVB[i].x), (int)(vecStarsVB[i].y), RGB(255 ,255 ,255 ));
 		}
 	}
 
@@ -99,10 +99,10 @@ void CController::RenderLandingPad(HDC &hdc )
 		vecRLPVB[i].x += PadPos.x ;
 		vecRLPVB[i].y += PadPos.y ;
 	}
-	MoveToEx(hdc ,vecRLPVB[NumPadVerts-1].x ,vecRLPVB[NumPadVerts-1].y ,NULL );
+	MoveToEx(hdc, (int)(vecRLPVB[NumPadVerts-1].x), (int)(vecRLPVB[NumPadVerts-1].y), NULL);
 	for(i=0 ;i<NumPadVerts ;i++ )
 	{
-		LineTo(hdc ,vecRLPVB[i].x ,vecRLPVB[i].y );
+		LineTo(hdc, (int)(vecRLPVB[i].x), (int)(vecRLPVB[i].y));
 	}
 	return ;
 }

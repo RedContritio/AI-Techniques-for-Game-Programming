@@ -38,7 +38,7 @@ vector<int> GENOME::GetRoute(void )
 void RouteRenderer(HDC hdc,const MAP &map ,const vector<int> &route )
 {
 	MoveToEx(hdc ,__RR__GetX(route.size()-1) ,__RR__GetY(route.size()-1) ,NULL );
-	for(int i=0 ;i<route.size() ;i++ )
+	for(int i=0 ;i<(int)(route.size()) ;i++ )
 	{
 		LineTo(hdc ,__RR__GetX(i) ,__RR__GetY(i) );
 	}
@@ -85,14 +85,14 @@ void POPULATION::Crossover(const vector<int> &parent1 ,const vector<int> &parent
 	if( RandFloat() > CrossoverRate || parent1 == parent2 )return ;
 	vector<int> map ;
 	int i ; // fuck VC++
-	for(i=0 ;i<parent1.size() ;i++ )map[i] = i ;
+	for(i=0 ;i<(int)(parent1.size()) ;i++ )map[i] = i ;
 	int p1 = RandInt(0 ,parent1.size() );
 	int p2 = RandInt(p1+1 ,parent1.size() );
 	for(i=p1 ;i<=p2 ;i++ )
 	{
 		swap(map[parent1[i]] ,map[parent2[i]] ) ;
 	}
-	for(i=0 ;i<child1.size() ;i++ )
+	for(i=0 ;i<(int)(child1.size()) ;i++ )
 	{
 		child1[i] = map[child1[i]] ;
 		child2[i] = map[child2[i]] ;
@@ -170,7 +170,7 @@ void POPULATION::Epoch(void )
 	{
 		vecNextGeneration.push_back(vecGenomes[FittestGenome] );
 	}
-	while(vecNextGeneration.size() < PopulationSize )
+	while((int)(vecNextGeneration.size()) < PopulationSize )
 	{
 		GENOME parent1 = RouletteWheelSelection();
 		GENOME parent2 = RouletteWheelSelection();

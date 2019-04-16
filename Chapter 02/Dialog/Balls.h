@@ -7,8 +7,8 @@
 class BALL
 {
 	private :
-		float px , py ;
-		float vx , vy ;
+		float m_px , m_py ;
+		float m_vx , m_vy ;
 		float __GetRandom(float ,float );
 	public :
 		BALL(void );

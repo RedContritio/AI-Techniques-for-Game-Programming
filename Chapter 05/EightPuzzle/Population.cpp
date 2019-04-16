@@ -80,7 +80,7 @@ void POPULATION::Epoch(void )
 	{
 		NextPopu.push_back(GENOME(chromosomeLength));
 	}*/
-	while(NextPopu.size() < populationSize )
+	while((int)(NextPopu.size()) < populationSize )
 	{
 		GENOME parent1 = RouletteSelection() ;
 		GENOME parent2 = RouletteSelection() ;
@@ -204,7 +204,7 @@ void ClearUselessOperations(const GAME &game ,vector<int> &genome )
 	GAME tmp = game ;
 	int chromosomeLength = genome.size() ;
 	int i=0 ; // fuck VC++
-	for(i=0 ;i<genome.size() ;i++ )
+	for(i=0 ;i<(int)(genome.size()) ;i++ )
 	{
 		if(!(tmp.Move(genome[i])))
 		{

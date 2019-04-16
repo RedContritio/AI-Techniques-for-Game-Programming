@@ -80,7 +80,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 	{
 		case WM_CREATE :
 		{
-			srand(time(0 ));
+			srand((unsigned)time(0));
 			GetClientArguments(hwnd );
 			BackBuffer.ResetBufferLayer(hwnd );
 			break ;

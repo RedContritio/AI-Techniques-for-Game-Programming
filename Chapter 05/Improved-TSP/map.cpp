@@ -2,7 +2,7 @@
 #include "LogSpawner.h"
 using RedContritio::LogSpawner ;
 extern LogSpawner loger ;
-__RC__COORD::__RC__COORD(void ){;}
+__RC__COORD::__RC__COORD(void ):_x(0), _y(0) {;}
 __RC__COORD::__RC__COORD(float x ,float y ):_x(x ),_y(y ){;}
 
 const static double pi = 1.0*acos(-1 );
@@ -11,7 +11,7 @@ void MAP::CreateCitiesCircular(void )
 {
 	const int margin = 30 ;
 	const int radius = (int)(min(MapWidth ,MapHeight )/2 - margin) ;
-	__RC__COORD center(0.5*MapWidth ,0.5*MapHeight );
+	__RC__COORD center(0.5f*MapWidth, 0.5f*MapHeight);
 	const double SegmentArc = 2.0 * pi / CitiesNum ;
 	double angle = 0 ;
 
@@ -19,8 +19,8 @@ void MAP::CreateCitiesCircular(void )
 	for(int i=0 ;i<CitiesNum ;i++ )
 	{
 		__RC__COORD city ;
-		city._x = center._x + radius * cos(angle );
-		city._y = center._y + radius * sin(angle );
+		city._x = (float)(center._x + radius * cos(angle ));
+		city._y = (float)(center._y + radius * sin(angle ));
 		vecTempCity.push_back(city );
 		
 		angle += SegmentArc ;
@@ -31,7 +31,7 @@ void MAP::CreateCitiesCircular(void )
 
 double MAP::CalculateDistance(const __RC__COORD &A ,const __RC__COORD &B )
 {
-	return sqrt(square(A._x -B._x )+square(A._y -B._y ));
+	return sqrt(square((double)(A._x) - (double)(B._x)) + square((double)(A._y) - (double)(B._y)));
 }
 
 void MAP::CalculateBestPossibleRoute(void )
@@ -46,7 +46,7 @@ void MAP::CalculateBestPossibleRoute(void )
 }
 
 MAP::MAP(int width ,int height ,int NumOfCities )
-		:MapWidth(width ),MapHeight(height ),CitiesNum(NumOfCities )
+		:MapWidth(width ),MapHeight(height ),CitiesNum(NumOfCities ), vecCities(), _BestPossibleLength(0)
 {
 	CreateCitiesCircular( );
 	CalculateBestPossibleRoute( );

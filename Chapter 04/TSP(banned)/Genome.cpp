@@ -146,7 +146,7 @@ void POPULATION::Epoch(void )
 	{
 		vecNewPopulation.push_back(vecGenomes[FittestGenome] );
 	}
-	while(vecNewPopulation.size() < PopulationSize )
+	while((int)(vecNewPopulation.size()) < PopulationSize )
 	{
 		GENOME parent1 = RouletteWheelSelection( );
 		GENOME parent2 = RouletteWheelSelection( );
@@ -181,15 +181,15 @@ void POPULATION::Render(HDC hdc ,int cx ,int cy )
 	int cs = __CITY__SIZE ;
 	for(int i=0 ;i<pMap->NumOfCities ;i++ )
 	{
-		int x = pMap->CitiesCoord[i].x ;
-		int y = pMap->CitiesCoord[i].y ;
+		int x = (int)(pMap->CitiesCoord[i].x) ;
+		int y = (int)(pMap->CitiesCoord[i].y) ;
 		Ellipse(hdc ,x-cs ,y-cs ,x+cs ,y+cs );
 	}
 	vector<int> route = vecGenomes[FittestGenome].vecRoute ;
 	if( Generation )
 	{
 		MoveToEx(hdc ,__PR__INT__GETX(0 ),__PR__INT__GETY(0 ),NULL );
-		for(int i=1 ;i<route.size() ;i++ )
+		for(int i=1 ;i<(int)(route.size()) ;i++ )
 		{
 			LineTo(hdc ,__PR__INT__GETX(i ),__PR__INT__GETY(i ));
 			char* num = itos(i );
@@ -199,9 +199,12 @@ void POPULATION::Render(HDC hdc ,int cx ,int cy )
 		LineTo(hdc ,__PR__INT__GETX(0 ),__PR__INT__GETY(0 ));
 	}
 	char* sGene = (char*)calloc(25 ,sizeof(char ));
-	sprintf(sGene ,"Generation : %d" ,Generation );
-	TextOut(hdc ,5 ,5 ,sGene ,strlen(sGene ));
-	free(sGene );
+	if (sGene)
+	{
+		sprintf(sGene, "Generation : %d", Generation);
+		TextOut(hdc, 5, 5, sGene, strlen(sGene));
+		free(sGene);
+	}
 }
 #undef __PR__INT__GETX
 #undef __PR__INT__GETY

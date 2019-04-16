@@ -8,6 +8,6 @@ inline int RandInt(int l ,int r )
 }
 inline double RandFloat(void )
 {
-	return 1.0 * rand() / ( RAND_MAX + 1 );
+	return 1.0 * rand() / ( RAND_MAX + 1.0 );
 }
 #endif

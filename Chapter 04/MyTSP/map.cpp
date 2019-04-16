@@ -11,7 +11,7 @@ void MAP::CreateCitiesCircular(void )
 {
 	const int margin = 30 ;
 	const int radius = (int)(min(MapWidth ,MapHeight )/2 - margin) ;
-	__RC__COORD center(0.5*MapWidth ,0.5*MapHeight );
+	__RC__COORD center(0.5f*MapWidth ,0.5f*MapHeight );
 	const double SegmentArc = 2.0 * pi / CitiesNum ;
 	double angle = 0 ;
 
@@ -19,8 +19,8 @@ void MAP::CreateCitiesCircular(void )
 	for(int i=0 ;i<CitiesNum ;i++ )
 	{
 		__RC__COORD city ;
-		city._x = center._x + radius * cos(angle );
-		city._y = center._y + radius * sin(angle );
+		city._x = (float)(center._x + radius * cos(angle ));
+		city._y = (float)(center._y + radius * sin(angle ));
 		vecTempCity.push_back(city );
 		
 		angle += SegmentArc ;

@@ -27,6 +27,9 @@
     <ClInclude Include="StandardWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="afxres.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Balls.cpp">
@@ -43,7 +46,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DiaglogBox.rc">
+    <ResourceCompile Include="DialogBox.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

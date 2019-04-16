@@ -12,7 +12,7 @@ GENOME::GENOME(const int NumOfBits ):Fitness(0 )
 
 void POPULATION::Mutate(vector<int> &vecBits )
 {
-	for(int i=0 ;i<vecBits.size() ;i++ )
+	for(int i=0 ;i<(int)(vecBits.size()) ;i++ )
 	{
 		if(RandFloat() < MutationRate )
 		{
@@ -39,7 +39,7 @@ void POPULATION::Crossover(const vector<int> &mum ,const vector<int> &dad ,
 		baby2.push_back(dad[i] );
 	}
 	;
-	for( ;i<mum.size() ;i++ )
+	for( ;i<(int)(mum.size()) ;i++ )
 	{
 		baby1.push_back(dad[i] );
 		baby2.push_back(mum[i] );
@@ -95,7 +95,7 @@ void POPULATION::UpdateFitnessScore(void  )
 
 	vector<int> vecDirections = Decode(vecGenome[FittestGenome].vecBits );
 	printf("Generation : %d \n" ,Generation );
-	for(int j=0 ;j<vecDirections.size() ;j++ )
+	for(int j=0 ;j<(int)(vecDirections.size()) ;j++ )
 	{
 		printf("%d ",vecDirections[j] );
 	}
@@ -105,7 +105,7 @@ void POPULATION::UpdateFitnessScore(void  )
 vector<int> POPULATION::Decode(const vector<int> &Bits )
 {
 	vector<int> directions ;
-	for(int gene=0 ;gene <Bits.size() ;gene += GeneLength )
+	for(int gene=0 ;gene <(int)(Bits.size()) ;gene += GeneLength )
 	{
 		vector<int> curGene ;
 		for(int bit=0 ;bit <GeneLength ;bit++ )
@@ -144,9 +144,10 @@ void POPULATION::CreateInitialPopulation(void )
 }
 
 POPULATION::POPULATION(double CrossRate ,double MutaRate ,int PopSize ,int NumBits ,
-					   int GeneLen ):CrossoverRate(CrossRate ),MutationRate(MutaRate ),
-					   PopSize(PopSize ),ChromosomeLength(NumBits ),TotalFitnessScore(0 ),
-					   Generation(0 ),GeneLength(GeneLen ),isBusy(false )
+	int GeneLen ):CrossoverRate(CrossRate ),MutationRate(MutaRate ),
+	PopSize(PopSize ),ChromosomeLength(NumBits ),TotalFitnessScore(0 ),
+	Generation(0 ),GeneLength(GeneLen ),isBusy(false ), BestFitnessScore(0),
+	FittestGenome(0)
 {
 	CreateInitialPopulation( );
 }
@@ -166,7 +167,7 @@ void POPULATION::Render(int cx ,int cy ,HDC surface )
 	char str[256] = "Generation : ";
 	sprintf(str+strlen(str ) ,"%d ",Generation );
 	TextOut(surface ,5 ,0 ,str ,strlen(str ));
-
+	
 	if(!isBusy )
 	{
 		char RestartStr[256] = "Press Enter to start a new turn .";

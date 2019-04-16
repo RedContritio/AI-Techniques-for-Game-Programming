@@ -22,8 +22,8 @@ static void GetClientArguments(HWND );
 POPULATION *salemen ;
 LRESULT CALLBACK WindowProc(HWND ,UINT ,WPARAM ,LPARAM );
 
-int WINAPI WinMain(HINSTANCE hInstance ,HINSTANCE hPrevInstance ,
-				   LPSTR lpCmdLine ,int nShowCmd )
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	WNDCLASSEX winClass ;
 	InitializeWindowClass(&winClass ,WindowProc ,hInstance ,MainClassName );
@@ -74,7 +74,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd ,UINT msg ,WPARAM wParam ,LPARAM lParam )
 	{
 		case WM_CREATE :
 		{
-			srand(time(0 ));
+			srand((unsigned)time(0 ));
 			GetClientArguments(hwnd );
 			BackBuffer.ResetBufferLayer(hwnd );
 
