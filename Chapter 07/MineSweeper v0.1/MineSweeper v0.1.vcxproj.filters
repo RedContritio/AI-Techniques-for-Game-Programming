@@ -18,9 +18,6 @@
     <ClInclude Include="BufferLayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="C2DMatrix.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -33,18 +30,30 @@
     <ClInclude Include="StandardWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
+    <ClInclude Include="Controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2d.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix2d.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MineSweeper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNet.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="utils.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Params.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferLayer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="C2DMatrix.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CTimer.cpp">
@@ -59,7 +68,22 @@
     <ClCompile Include="StandardWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="utils.cpp">
+    <ClCompile Include="Controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2d.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix2d.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MineSweeper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Params.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

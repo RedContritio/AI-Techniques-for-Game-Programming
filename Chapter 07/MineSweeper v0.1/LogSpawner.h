@@ -1,5 +1,5 @@
-#ifndef __LOG__SPAWN__INC
-#define __LOG__SPAWN__INC
+#ifndef __LOG_SPAWN__INC
+#define __LOG_SPAWN__INC
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -12,25 +12,18 @@ namespace RedContritio
 	class LogSpawner
 	{
 		private :
-			FILE* fout ;
-			int SizeOfBuffer ;
-			char* buffer ;
-			int buflen ;
-			mutable int counter ;
-			void print(void );
-			void load(const char* );
-
-			int sputs(char* ,const char* );
-			int lprintch(char* ,const char & );
-			int lprintdec(char* ,const int & );
-			int lprintflt(char* ,const double & );
-			int lprintstr(char* ,const char* );
+			FILE* m_fout ;
+			bool m_toclose;
+			void open(const char* FileName);
+			void close(void);
+			static void timestamp(FILE *_Stream);
 		public :
-			LogSpawner(const char* FileName = ".log" ,int Size = 4097 );
-			~LogSpawner(void );
-			void clear(void );
-			int lprint(const char* ,...);
-			FILE* Redirect(const char* );
+			LogSpawner(const char* FileName = ".log");
+			LogSpawner(FILE *_Stream);
+			~LogSpawner(void);
+			int printf(const char* ,...) const;
+			FILE* redirect(const char* );
+			FILE *redirect(FILE *_Stream);
 	};
 }
 #endif

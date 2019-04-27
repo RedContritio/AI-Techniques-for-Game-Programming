@@ -3,7 +3,7 @@
 //---------------------- default constructor ------------------------------
 //
 //-------------------------------------------------------------------------
-CTimer::CTimer(): m_FPS(0),
+TIMER::TIMER(): m_FPS(0),
 				          m_TimeElapsed(0.0f),
 				          m_FrameTime(0),
 				          m_LastTime(0),
@@ -20,7 +20,7 @@ CTimer::CTimer(): m_FPS(0),
 //	use to specify FPS
 //
 //-------------------------------------------------------------------------
-CTimer::CTimer(float fps): m_FPS(fps),
+TIMER::TIMER(float fps): m_FPS(fps),
 						               m_TimeElapsed(0.0f),
 						               m_LastTime(0),
 						               m_PerfCountFreq(0)
@@ -41,7 +41,7 @@ CTimer::CTimer(float fps): m_FPS(fps),
 //	call this immediately prior to game loop. Starts the timer (obviously!)
 //
 //--------------------------------------------------------------------------
-void CTimer::Start()
+void TIMER::Start()
 {
 	//get the time
 	QueryPerformanceCounter( (LARGE_INTEGER*) &m_LastTime);
@@ -58,7 +58,7 @@ void CTimer::Start()
 //	FPS is set.
 //
 //----------------------------------------------------------------------------
-bool CTimer::ReadyForNextFrame()
+bool TIMER::ReadyForNextFrame()
 {
 	if (!m_FPS)
   {
@@ -90,7 +90,7 @@ bool CTimer::ReadyForNextFrame()
 //	when calculations are to be based on dt.
 //
 //-------------------------------------------------------------------------
-double CTimer::TimeElapsed()
+double TIMER::TimeElapsed()
 {
 	QueryPerformanceCounter( (LARGE_INTEGER*) &m_CurrentTime);
 	

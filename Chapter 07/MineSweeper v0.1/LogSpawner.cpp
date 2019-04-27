@@ -1,223 +1,78 @@
 #include "LogSpawner.h"
+#include <cstdio>
+#include <cstdarg>
+
 #pragma warning(disable : 4996)
 namespace RedContritio
 {
-	LogSpawner::LogSpawner(const char* FileName ,int Size ):fout(NULL ),SizeOfBuffer(Size ),buflen(0 ),counter(0 )
-	{
-		if(FileName )fout = fopen(FileName ,"a+" );
-		buffer = (char*)calloc(SizeOfBuffer ,sizeof(char ));
-	}
 
-	LogSpawner::~LogSpawner(void )
-	{
-		if(buffer )
-		{
-			buffer[buflen++] = '\n' ;
-			clear( );
-			free(buffer );
-			buffer = NULL ;
-		}
-		if(fout )
-		{
-			fclose(fout );
-			fout = NULL ;
-		}		
-	}
+LogSpawner::LogSpawner(const char *_FileName) : m_fout(NULL), m_toclose(false)
+{
+	if ( _FileName ) this->open(_FileName);
+}
 
-	int LogSpawner::lprint(const char* Message ,...)
-	{
-		int BufferSize = (SizeOfBuffer > (int)(8*strlen(Message)))?(SizeOfBuffer ):(8 *strlen(Message ));
-		char* temp = (char*)calloc(SizeOfBuffer ,BufferSize * sizeof(char ));
-		int tmplen = 0 ;
-		
-		time_t rawtime;
-		tm *timeinfo = NULL ;
+LogSpawner::LogSpawner(FILE *_Stream) : m_fout(_Stream), m_toclose(false) {}
 
-		time(&rawtime );
-		timeinfo = localtime(&rawtime );
-		
-		sputs(temp+tmplen ,asctime(timeinfo ));
-		tmplen = 20 ; temp[20] = 0 ;
-		
-		{
-			double vargflt = 0.0 ;
-			int vargint = 0 ;
-			char* vargstr = NULL ;
-			char vargch = 0 ;
-			
-			const char* pfmt = Message ;
-			va_list vp ;
-			va_start(vp ,Message );
+LogSpawner::~LogSpawner(void)
+{
+	if ( this->m_fout ) this->close();
+}
 
-			while(*pfmt )
-			{
-				if(*pfmt == '%' )
-				{
-					pfmt ++ ;
-					switch(*pfmt )
-					{
-						case 'c' :
-						{
-							vargch = va_arg(vp ,int );
-							tmplen += lprintch(temp+tmplen ,vargch );
-							break ;
-						}
-						case 'i' : case 'd' :
-						{
-							vargint = va_arg(vp ,int );
-							tmplen += lprintdec(temp+tmplen ,vargint );
-							break ;
-						}
-						case 's' :
-						{
-							vargstr = va_arg(vp ,char* );
-							tmplen += lprintstr(temp+tmplen ,vargstr );
-							break ;
-						}
-						case 'l' :
-						{
-							if(*(pfmt+1 ) != 'f' )
-							{
-								break ;
-							}
-							pfmt ++ ;
-						}
-						case 'f' :
-						{
-							vargflt = va_arg(vp ,double );
-							tmplen += lprintflt(temp+tmplen ,vargflt );
-							break ;
-						}
-						case '%' :
-						{
-							tmplen += lprintch(temp+tmplen ,'%' );
-							break ;
-						}
-					}
-				}
-				else if(*pfmt == '\\' )
-				{
-					pfmt ++ ;
-					switch(*pfmt )
-					{
-						case 'n' :
-						{
-							tmplen += lprintch(temp+tmplen ,'\n' );
-							break ;
-						}
-						case '\\' :
-						{
-							tmplen += lprintch(temp+tmplen ,'\\' );
-							break ;
-						}
-						case 't' :
-						{
-							tmplen += lprintch(temp+tmplen ,'\t' );
-							break ;
-						}
-						case 'r' :
-						{
-							tmplen += lprintch(temp+tmplen ,'\t' );
-							break ;
-						}
-						default :
-							break ;
-					}
-				}
-				else
-				{
-					tmplen += lprintch(temp+tmplen ,*pfmt );
-				}
-				pfmt ++ ;
-			}
-			va_end(vp );
-			
-		}
+void LogSpawner::open(const char *_FileName)
+{
+	assert(_FileName); // FileName != NULL
+#ifdef __STDC_WANT_SECURE_LIB__
+	fopen_s(&(this->m_fout), _FileName, "a+");
+#else
+	this->m_fout = fopen(_FileName, "a+");
+#endif
+	if ( !(this->m_fout) ) throw("File open failed.");
+	this->m_toclose = true;
+}
 
-		load(temp );
-		free(temp );
-		return tmplen ;
-	}
-	
-	void LogSpawner::load(const char* str )
-	{
-		int nlen = strlen(str );
-		if(nlen +buflen >= SizeOfBuffer )
-		{
-			print( );
-		}
-		memcpy(buffer+buflen ,str ,nlen );
-		buflen += nlen ;
-		counter ++ ;
-	}
+void LogSpawner::close(void)
+{
+	assert(this->m_fout);
+	fclose(this->m_fout);
+	this->m_fout = NULL;
+	this->m_toclose = false;
+}
 
-	int LogSpawner::sputs(char* dest ,const char* source )
-	{
-		int len = strlen(source );
-		memcpy(dest ,source ,len * sizeof(char ));
-		return len ;
-	}
+int LogSpawner::printf(const char *_Format, ...) const
+{
+	if ( !(this->m_fout) ) return 0;
 
-	FILE* LogSpawner::Redirect(const char* FileName = ".log" )
-	{
-		if(fout )
-		{
-			clear( );
-			fclose(fout );
-		}
-		fout = fopen(FileName ,"a+" );
-		return fout ;
-	}
+	timestamp(this->m_fout);
 
-	void LogSpawner::print(void )
-	{
-		fwrite(buffer ,buflen ,sizeof(char ),fout );
-		memset(buffer ,0 ,buflen * sizeof(char ));
-		buflen = 0 ;
-	}
+	va_list _ArgList;
+	va_start(_ArgList, _Format);
+	int n = vfprintf(this->m_fout, _Format, _ArgList);
+	va_end(_ArgList);
 
-	
+	return n;
+}
 
-	void LogSpawner::clear(void )
-	{
-		if(buffer )
-		{
-			if(buflen )
-			{
-				print( );
-			}
-		}
-	}
+FILE *LogSpawner::redirect(const char *_FileName)
+{
+	if ( this->m_fout && this->m_toclose) this->close();
+	if ( _FileName ) this->open(_FileName);
+	return this->m_fout;
+}
 
-	int LogSpawner::lprintch(char* dst ,const char &ch )
-	{
-		*dst = ch ;
-		return 1 ;
-	}
-	int LogSpawner::lprintdec(char* dst ,const int &num )
-	{
-		char* temp = (char*)calloc(12 ,sizeof(char));
-		sprintf(temp ,"%d" ,num );
-		int len = strlen(temp );
-		memcpy(dst ,temp ,len*sizeof(char) );
-		free(temp );
-		return len ;
-	}
-	int LogSpawner::lprintstr(char* dst ,const char* src )
-	{
-		int len = strlen(src );
-		memcpy(dst ,src ,len*sizeof(char) );
-		return len ;
-	}
-	int LogSpawner::lprintflt(char* dst ,const double &flt )
-	{
-		char* temp = (char*)calloc(36 ,sizeof(char));
-		sprintf(temp ,"%lf" ,flt );
-		int len = strlen(temp );
-		memcpy(dst ,temp ,len*sizeof(char) );
-		free(temp );
-		return len ;
-	}
+FILE *LogSpawner::redirect(FILE *_Stream)
+{
+	if ( this->m_fout && this->m_toclose ) this->close();
+	this->m_fout = _Stream;
+	return this->m_fout;
+}
 
-	
+void LogSpawner::timestamp(FILE *_Stream)
+{
+	time_t rawtime;
+	tm *timeinfo;
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	fprintf(_Stream, "%d:%d:%d ", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+}
+
 }

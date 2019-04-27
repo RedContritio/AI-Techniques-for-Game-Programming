@@ -116,22 +116,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BufferLayer.h" />
-    <ClInclude Include="C2DMatrix.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="CTimer.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="LogSpawner.h" />
+    <ClInclude Include="Matrix2d.h" />
+    <ClInclude Include="MineSweeper.h" />
+    <ClInclude Include="NeuralNet.h" />
+    <ClInclude Include="Params.h" />
     <ClInclude Include="StandardWindow.h" />
-    <ClInclude Include="utils.h" />
     <ClInclude Include="utils.hpp" />
+    <ClInclude Include="Vector2d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferLayer.cpp" />
-    <ClCompile Include="C2DMatrix.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="LogSpawner.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrix2d.cpp" />
+    <ClCompile Include="MineSweeper.cpp" />
+    <ClCompile Include="NeuralNet.cpp" />
+    <ClCompile Include="Params.cpp" />
     <ClCompile Include="StandardWindow.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="Vector2d.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

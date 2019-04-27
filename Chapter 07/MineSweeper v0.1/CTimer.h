@@ -14,7 +14,7 @@
 #include <windows.h>
 
 
-class CTimer
+class TIMER
 {
 	private:
 	LONGLONG	m_CurrentTime,
@@ -30,8 +30,8 @@ class CTimer
 public:
 
   //ctors
-	CTimer();
-	CTimer(float fps);
+	TIMER();
+	TIMER(float fps);
 
 
 	//whatdayaknow, this starts the timer

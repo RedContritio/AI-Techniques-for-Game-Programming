@@ -1,72 +1,69 @@
 #include "BufferLayer.h"
 namespace RedContritio
 {
-	BUFFERLAYER::BUFFERLAYER(void )
-	{
-		hBufferLayer = NULL ;
-		hBitmap = NULL ;
-		hPrevBitmap = NULL ;
-	}
 
-	BUFFERLAYER::BUFFERLAYER(HWND hwnd )
-	{
-		BuildAll(hwnd );
-	}
+#pragma warning(push)
+#pragma warning(disable:6387)
+BUFFERLAYER::BUFFERLAYER(void) : hdc(NULL), hBitmap(NULL), hPrevBitmap(NULL)
+{
+}
 
-	void BUFFERLAYER::DeleteAll(void )
-	{
-		SelectObject(hBufferLayer ,hPrevBitmap );
-		DeleteObject(hBitmap );
-		hBitmap = NULL ;
-		DeleteDC(hBufferLayer );
-		hBufferLayer = NULL ;
-	}
+BUFFERLAYER::BUFFERLAYER(HWND hwnd) : hdc(NULL), hBitmap(NULL), hPrevBitmap(NULL)
+{
+	build(hwnd);
+}
 
-	void BUFFERLAYER::BuildAll(HWND hwnd )
-	{
-		RECT rect ;
-		GetClientRect(hwnd ,&rect );
-		hBufferLayer = CreateCompatibleDC(NULL );
-		HDC hdc = GetDC(hwnd );
-		hBitmap = CreateCompatibleBitmap(hdc ,rect.right ,rect.bottom );
-		hPrevBitmap = (HBITMAP)SelectObject(hBufferLayer ,hBitmap );
-		ReleaseDC(hwnd ,hdc );
-	}
+void BUFFERLAYER::release(void)
+{
+	SelectObject(hdc, hPrevBitmap);
+	DeleteObject(hBitmap);
+	hBitmap = NULL;
+	DeleteDC(hdc);
+	hdc = NULL;
+}
 
-	HDC BUFFERLAYER::GetHdc(void )
-	{
-		return hBufferLayer ;
-	}
+void BUFFERLAYER::build(HWND hwnd)
+{
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	hdc = CreateCompatibleDC(NULL);
+	HDC _hdc = GetDC(hwnd);
+	hBitmap = CreateCompatibleBitmap(_hdc, rect.right, rect.bottom);
+	hPrevBitmap = (HBITMAP) SelectObject(hdc, hBitmap);
+	ReleaseDC(hwnd, _hdc);
+}
 
-	void BUFFERLAYER::AdjustSize(HWND hwnd )
+void BUFFERLAYER::Adjust(HWND hwnd)
+{
+	if ( hdc )
 	{
-		if(hBufferLayer )
-		{
-			SelectObject(hBufferLayer ,hPrevBitmap );
-			DeleteObject(hBitmap );
-		}
-		RECT rect ;
-		GetClientRect(hwnd ,&rect );
-		HDC hdc = GetDC(hwnd );
-		hBitmap = CreateCompatibleBitmap(hdc ,rect.right ,rect.bottom );
-		hPrevBitmap = (HBITMAP)SelectObject(hBufferLayer ,hBitmap );
-		ReleaseDC(hwnd ,hdc );
-		return ;
+		SelectObject(hdc, hPrevBitmap);
+		DeleteObject(hBitmap);
 	}
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	HDC _hdc = GetDC(hwnd);
+	hBitmap = CreateCompatibleBitmap(_hdc, rect.right, rect.bottom);
+	hPrevBitmap = (HBITMAP) SelectObject(hdc, hBitmap);
+	ReleaseDC(hwnd, _hdc);
+	return;
+}
 
-	void BUFFERLAYER::ResetBufferLayer(HWND hwnd )
-	{
-		if(hBufferLayer )DeleteAll( );
+void BUFFERLAYER::Reset(HWND hwnd)
+{
+	if ( hdc )release();
 
-		BuildAll(hwnd );
-	}
+	build(hwnd);
+}
 
-	void BUFFERLAYER::DeleteBufferLayer(void )
-	{
-		if(hBufferLayer )DeleteAll( );
-	}
-	BUFFERLAYER::~BUFFERLAYER(void )
-	{
-		if(hBufferLayer )DeleteAll( );
-	}
+void BUFFERLAYER::Delete(void)
+{
+	if ( hdc )release();
+}
+BUFFERLAYER::~BUFFERLAYER(void)
+{
+	if ( hdc )release();
+}
+
+#pragma warning(pop)
 }
