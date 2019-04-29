@@ -16,16 +16,11 @@
 
 class TIMER
 {
-	private:
-	LONGLONG	m_CurrentTime,
-	          m_LastTime,
-				    m_NextTime,
-				    m_FrameTime,
-				    m_PerfCountFreq;
+private:
+	mutable LONGLONG m_CurrentTime, m_LastTime, m_NextTime, m_FrameTime, m_PerfCountFreq;
 
-	double		m_TimeElapsed,
-				    m_TimeScale;
-	float		  m_FPS;
+	double m_TimeElapsed, m_TimeScale;
+	float m_FPS;
 
 public:
 
@@ -35,13 +30,13 @@ public:
 
 
 	//whatdayaknow, this starts the timer
-  void		Start();
+	void		Start();
 
-	//determines if enough time has passed to move onto next frame
-  bool		ReadyForNextFrame();
+	  //determines if enough time has passed to move onto next frame
+	bool		ReadyForNextFrame();
 
-	//only use this after a call to the above.
-	double	GetTimeElapsed(){return m_TimeElapsed;}
+	  //only use this after a call to the above.
+	double	GetTimeElapsed() { return m_TimeElapsed; }
 
 	double	TimeElapsed();
 };
@@ -50,4 +45,4 @@ public:
 
 #endif
 
-	
+

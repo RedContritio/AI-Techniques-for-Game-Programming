@@ -12,6 +12,9 @@ namespace RedContritio
 
 namespace NeuralNetwork
 {
+
+NeuralNet::NeuralNet(void) : m_NumInputs(0), m_NumOutputs(0), m_NumHiddenLayers(0), m_NumNeuronsPerLayer(0), m_Layers() {}
+
 NeuralNet::NeuralNet(int NumInputs, int NumOutputs, int NumHiddenLayer, int NumNeuronsPerLayer, std::vector<NeuronLayer> Layers) :
 	m_NumInputs(NumInputs), m_NumOutputs(NumOutputs), m_NumHiddenLayers(NumHiddenLayer), m_NumNeuronsPerLayer(NumNeuronsPerLayer),
 	m_Layers(Layers) {}

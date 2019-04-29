@@ -9,6 +9,7 @@
 #include <functional>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 extern Params params;
 
@@ -53,7 +54,7 @@ MineSweeper::~MineSweeper()
 {
 }
 
-bool MineSweeper::Update(std::vector<Vector2d> &mines)
+bool MineSweeper::Update(const std::vector<Vector2d> &mines)
 {
 	UpdateClosestMine(mines);
 
@@ -82,7 +83,6 @@ bool MineSweeper::Update(std::vector<Vector2d> &mines)
 	m_lookat = Vector2d(cos(m_rotation), sin(m_rotation));
 
 	m_position += m_lookat * m_speed;
-	logger.printf("speed: %g", m_speed);
 
 	CirculantWarp(m_position.x, 0, Params::WindowWidth);
 	CirculantWarp(m_position.y, 0, Params::WindowHeight);
@@ -118,6 +118,11 @@ RedContritio::Matrix2d MineSweeper::GetTransformMatrix(void) const
 	return Matrix2d::transform(m_position.x, m_position.y, Params::SweeperScale, Params::SweeperScale, m_rotation);
 }
 
+std::vector<double> MineSweeper::GetWeights(void) const
+{
+	return m_brain.GetWeights();
+}
+
 void MineSweeper::PutWeights(std::vector<double> &w)
 {
 	m_brain.PutWeights(w);
@@ -128,18 +133,58 @@ int MineSweeper::GetNumberOfWeights(void) const
 	return m_brain.GetNumberOfWeights();
 }
 
+int MineSweeper::GetClosestMine(void) const
+{
+	return m_closestMine;
+}
+
+int MineSweeper::CheckCollision(const std::vector<RedContritio::Vector2d> &mines) const
+{
+	if ( Vector2dLength(VectorDifferenceInWorld(m_position, mines[m_closestMine],
+												Vector2d(Params::WindowWidth, Params::WindowHeight))) <= CollisionSize )
+	{
+		return m_closestMine;
+	}
+	else
+	{
+		return CollisionFailed;
+	}
+}
+
+bool MineSweeper::operator<(const MineSweeper &rhs) const
+{
+	return this->m_fitness < rhs.m_fitness;
+}
+
 
 void MineSweeper::UpdateClosestMine(const std::vector<Vector2d> &mines)
 {
 	m_closestMine = 0;
-	double dis = 1.0 * Params::WindowWidth * Params::WindowHeight;
+	Vector2d world(Params::WindowWidth, Params::WindowHeight);
+	double dis = 1.0 * world.length();
 	for ( unsigned i = 0; i<mines.size(); ++i )
 	{
-		if ( Vector2dLength(m_position - mines[i]) < dis )
+		Vector2d vec(VectorDifferenceInWorld(m_position, mines[i], world));
+		if ( vec.length() < dis )
 		{
 			m_closestMine = i;
-			dis = Vector2dLength(m_position - mines[i]);
+			dis = vec.length();
 		}
 	}
 	return;
+}
+
+Vector2d VectorDifferenceInWorld(Vector2d v1, Vector2d v2, Vector2d worldsize)
+{
+	double dx0 = v2.x - v1.x + worldsize.x;
+	double dx1 = v2.x - v1.x;
+	double dx2 = v2.x - v1.x - worldsize.x;
+	double dy0 = v2.y - v1.y + worldsize.y;
+	double dy1 = v2.y - v1.y;
+	double dy2 = v2.y - v1.y - worldsize.y;
+	double dx = fabs(dx0) < fabs(dx1) ? dx0 : dx1;
+	dx = fabs(dx) < fabs(dx2) ? dx : dx2;
+	double dy = fabs(dy0) < fabs(dy1) ? dy0 : dy1;
+	dy = fabs(dy) < fabs(dy2) ? dy : dy2;
+	return Vector2d(dx, dy);
 }

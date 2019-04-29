@@ -119,6 +119,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="CTimer.h" />
     <ClInclude Include="defines.h" />
+    <ClInclude Include="GeneticAlgorithms.h" />
     <ClInclude Include="LogSpawner.h" />
     <ClInclude Include="Matrix2d.h" />
     <ClInclude Include="MineSweeper.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="BufferLayer.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="GeneticAlgorithms.cpp" />
     <ClCompile Include="LogSpawner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix2d.cpp" />

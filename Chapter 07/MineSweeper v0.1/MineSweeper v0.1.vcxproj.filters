@@ -51,6 +51,9 @@
     <ClInclude Include="Params.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GeneticAlgorithms.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BufferLayer.cpp">
@@ -84,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Params.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneticAlgorithms.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

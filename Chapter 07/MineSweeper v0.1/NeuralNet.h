@@ -43,7 +43,7 @@ private:
 	int m_NumNeuronsPerLayer;
 	std::vector<NeuronLayer> m_Layers;
 public:
-	NeuralNet(void) = default;
+	NeuralNet(void);
 	NeuralNet(int NumInputs, int NumOutputs, int NumHiddenLayer, int NumNeuronsPerLayer, std::vector<NeuronLayer> Layers);
 	~NeuralNet(void);
 	NeuralNet(const NeuralNet &pro) = default;

@@ -48,7 +48,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 		if ( AllocConsole() )
 		{
+		#ifdef __STDC_WANT_SECURE_LIB__
 			errno_t errid = freopen_s(NULL, "CONOUT$", "w", stdout);
+		#else
+			freopen("CONOUT$", "w", stdout);
+		#endif
+			
 		}//Open Console
 	}
 
@@ -73,6 +78,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	bool EndFlag = false;
 	TIMER timer((params.FramesPerSecond != 0) ? (1.0f * params.FramesPerSecond) : __FRAME__PER__SECOND);
 	MSG msg;
+
+	timer.Start();
 	while ( !EndFlag )
 	{
 		while ( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)!= 0 )
@@ -89,8 +96,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		}
 
 
-		if ( timer.ReadyForNextFrame() )
+		if ( timer.ReadyForNextFrame() || ( pController && pController->isFastIterating()))
 		{
+			if ( pController && pController->isSlowIterating() )
+			{
+				static int t = 5;
+				if ( --t > 0 ) continue;
+				t = 5;
+			}
 			if ( pController ) pController->Update();
 			InvalidateRect(hwnd, NULL, true);
 			UpdateWindow(hwnd);
@@ -136,12 +149,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				case 'S':
 				{
-					//pPopulation->SlowMode = true ;
+					if ( pController ) pController->ToggleSlowIterating();
 					break;
 				}
 				case 'F':
 				{
-					//pPopulation->SlowMode = false ;
+					if ( pController ) pController->ToggleFastIterating();
+					break;
+				}
+				case 'V':
+				{
+					if ( pController ) pController->Watch();
 					break;
 				}
 				case VK_RETURN:
@@ -150,6 +168,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				}
 				case VK_SPACE:
 				{
+					if ( pController )pController->Pause();
 					break;
 				}
 				case VK_LEFT: case VK_UP:

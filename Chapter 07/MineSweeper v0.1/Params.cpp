@@ -17,13 +17,14 @@ Params::Params(const char *_FileName)
 	}
 	else
 	{
-		logger.printf("parameters loading end.\n");
+		logger.printf("|= parameters loading end.\n");
+		logger.printf("---------------------------------------------\n");
 	}
 }
 
 #define LoadParameter(name, type) do { \
 	assert(0 < fscanf(fin, "%*s" type, &(this->name))); \
-		logger.printf("para@" #name ": " type " \n", this->name); \
+		logger.printf("|- para@ " #name ": " type " \n", this->name); \
 } while ( 0 );
 
 
@@ -37,7 +38,8 @@ bool Params::LoadInParameters(const char *_FileName)
 #endif
 	if ( !fin ) return false;
 
-	logger.printf("loading parameters\n");
+	logger.printf("---------------------------------------------\n");
+	logger.printf("|= loading parameters\n");
 
 	LoadParameter(FramesPerSecond, "%d");
 

@@ -6,6 +6,8 @@
 #include "Vector2d.h"
 #include "Matrix2d.h"
 
+#include "GeneticAlgorithms.h"
+
 #include <vector>
 #include <string>
 #include <functional>
@@ -15,6 +17,7 @@
 class Controller
 {
 private:
+	GeneticPopulation *m_pGeneticOperations;
 	std::vector<MineSweeper> m_sweepers;
 	std::vector<RedContritio::Vector2d> m_mines;
 
@@ -24,18 +27,36 @@ private:
 	std::function<void(HDC, const RedContritio::Matrix2d &)> m_SweeperPainter;
 	std::function<void(HDC, const RedContritio::Matrix2d &)> m_MinePainter;
 
-	HPEN m_PenRed, m_PenGreen, m_PenBlue, m_PenOld;
+	HPEN m_PenRed, m_PenGreen, m_PenBlue, m_PenBlack, m_PenNULL;
+	HPEN m_PenOld;
+
+	HBRUSH m_BrushRed, m_BrushBlue, m_BrushYellow, m_BrushNULL;
+	HBRUSH m_BrushOld;
 
 	const int &m_cxClient, &m_cyClient;
 
 	int m_ticks;
 
+	bool m_isPaused;
+	bool m_isFastIterating, m_isSlowIterating;
+	bool m_isWatching;
+
 	std::function<MineSweeper (void)> GenerateRandomSweeper;
+
+	void resetMine(int id);
+	void resetMine(void);
 public:
 	Controller(void);
 	~Controller(void);
 	void Render(HDC surface);
 	bool Update(void);
+	bool Pause(void);
+	bool Watch(void);
+	bool ToggleFastIterating(void);
+	bool ToggleSlowIterating(void);
+	bool isFastIterating(void) const;
+	bool isSlowIterating(void) const;
+
 };
 
 #endif
