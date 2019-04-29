@@ -6,7 +6,7 @@
 #include "Vector2d.h"
 #include "Matrix2d.h"
 
-#include "GeneticAlgorithms.h"
+#include "GeneticAlgorithms.hpp"
 
 #include <vector>
 #include <string>
@@ -17,7 +17,6 @@
 class Controller
 {
 private:
-	GeneticPopulation *m_pGeneticOperations;
 	std::vector<MineSweeper> m_sweepers;
 	std::vector<RedContritio::Vector2d> m_mines;
 
@@ -35,7 +34,7 @@ private:
 
 	const int &m_cxClient, &m_cyClient;
 
-	int m_ticks;
+	int m_ticks, m_generation;
 
 	bool m_isPaused;
 	bool m_isFastIterating, m_isSlowIterating;

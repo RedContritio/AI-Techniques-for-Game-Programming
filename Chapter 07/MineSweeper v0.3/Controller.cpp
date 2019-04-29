@@ -5,12 +5,21 @@
 #include "Params.h"
 #include "utils.hpp"
 
+#include "GeneticAlgorithms.hpp"
+
 #include <algorithm>
 #include <vector>
 
 using RedContritio::Vector2d;
 using RedContritio::Matrix2d;
 using RedContritio::Utils::RandFloat;
+
+using RedContritio::GeneticAlgorithm::GENOME;
+using RedContritio::GeneticAlgorithm::RelatedFitnessInfo;
+using RedContritio::GeneticAlgorithm::Mutator;
+using RedContritio::GeneticAlgorithm::SplitCrossover;
+using RedContritio::GeneticAlgorithm::RouletteSelector;
+using RedContritio::GeneticAlgorithm::EliteKeeper;
 
 const Vector2d SweeperVertices[] = {Vector2d(4, 0.5), Vector2d(2, 0.5), Vector2d(2, 2), Vector2d(-2, 2),
 Vector2d(-2, -2), Vector2d(2, -2), Vector2d(2, -0.5), Vector2d(4, -0.5)};
@@ -24,7 +33,6 @@ void LocalMinePaint(HDC surface, const Matrix2d &mat);
 auto GetRandomVector2d = [](void) -> Vector2d { return Vector2d(RandFloat()* Params::WindowWidth, RandFloat()* Params::WindowHeight); };
 
 Controller::Controller(void) :
-	m_pGeneticOperations(NULL),
 	m_PenBlue(CreatePen(PS_SOLID, 1, RGB(0x00, 0x00, 0xFF))), m_PenGreen(CreatePen(PS_SOLID, 1, RGB(0x00, 0xFF, 0x00))),
 	m_PenRed(CreatePen(PS_SOLID, 1, RGB(0xFF, 0x00, 0x00))), m_PenBlack(CreatePen(PS_SOLID, 1, RGB(0x00, 0x00, 0x00))),
 	m_PenNULL(HPEN(GetStockObject(NULL_PEN))),
@@ -34,7 +42,8 @@ Controller::Controller(void) :
 	m_BrushOld(NULL),
 	m_numMines(Params::NumMines), m_numSweepers(Params::NumSweepers),
 	m_cxClient(Params::WindowWidth), m_cyClient(Params::WindowHeight),
-	m_ticks(0), m_isPaused(false), m_isWatching(false),m_isFastIterating(false), m_isSlowIterating(false),
+	m_ticks(0), m_generation(0),
+	m_isPaused(false), m_isWatching(false),m_isFastIterating(false), m_isSlowIterating(false),
 	GenerateRandomSweeper([](void) -> MineSweeper {
 	return MineSweeper(RedContritio::NeuralNetwork::GenerateRandomNeuralNet(Params::NumInputs, Params::NumOutputs,
 																			Params::NumHiddenLayers, Params::NeuronsPerHiddenLayer)); }),
@@ -49,9 +58,6 @@ Controller::Controller(void) :
 	{
 		m_mines.push_back(GetRandomVector2d());
 	}
-
-	m_pGeneticOperations = new GeneticPopulation(Params::NumSweepers, m_sweepers[0].GetNumberOfWeights(),
-												 Params::MutationRate, Params::CrossoverRate);
 
 //	m_pGeneticOperations->SetSplits(m_sweepers[0].GetSplits());
 }
@@ -143,22 +149,29 @@ bool Controller::Update(void)
 			// TODO: ¸´Î»²Ù×÷
 			m_ticks = 0;
 			resetMine();
-			std::vector<GENOME> generation;
+			std::vector<GENOME> prev;
 			for ( unsigned i = 0; i<m_sweepers.size(); ++i )
 			{
-				generation.push_back(GENOME(m_sweepers[i].GetWeights(), m_sweepers[i].Fitness()));
+				prev.push_back(GENOME(m_sweepers[i].GetWeights(), m_sweepers[i].Fitness()));
 			}
 
-			std::vector<GENOME> next_generation(m_pGeneticOperations->Epoch(generation));
+			std::vector<GENOME> nextGene;
 
-			logger.printf("interating...\n->generation[%02d]: best: %d ,average: %d\n", m_pGeneticOperations->Generation(),
-				m_pGeneticOperations->BestFitness(), m_pGeneticOperations->AverageFitness());
+			RelatedFitnessInfo info;
+
+			RedContritio::GeneticAlgorithm::Epoch(prev, nextGene, &info, Mutator(Params::MutationRate),
+				SplitCrossover(Params::CrossoverRate, m_sweepers[0].GetSplits()), RouletteSelector(),
+				EliteKeeper(Params::NumElite, Params::NumCopiesElite));
+
+			logger.printf("interating...\n->generation[%02d]: best: %d ,average: %d\n", m_generation,
+				info.BestFitness, info.AverageFitness);
 
 			for ( unsigned i = 0; i<m_sweepers.size(); ++i )
 			{
 				m_sweepers[i].Reset();
-				m_sweepers[i].PutWeights(next_generation[i].m_gene);
+				m_sweepers[i].PutWeights(nextGene[i].weights);
 			}
+			++m_generation;
 		}
 	}
 	return true;

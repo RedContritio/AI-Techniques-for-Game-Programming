@@ -1,4 +1,4 @@
-#include "GeneticAlgorithms.h"
+#include "GeneticAlgorithms.hpp"
 #include "Params.h"
 #include "utils.hpp"
 
@@ -8,169 +8,63 @@ using RedContritio::Utils::RandFloat;
 using RedContritio::Utils::RandClamped;
 using RedContritio::Utils::RandInt;
 
-GENOME::GENOME(std::vector<double> weights, double fitness) :m_gene(weights), m_fitness(fitness)
+namespace RedContritio
 {
+namespace GeneticAlgorithm
+{
+
+void Mutator::operator()(GENOME &gene) const
+{
+	for ( unsigned i = 0; i < gene.weights.size(); ++i )
+	{
+		if ( RandFloat() < Rate )
+		{
+			gene.weights[i] += RandClamped() * Params::MaxPerturbation;
+		}
+	}
 }
 
-bool GENOME::operator<(const GENOME &rhs) const
-{
-	return m_fitness < rhs.m_fitness;
-}
-
-void GeneticPopulation::Crossover(const std::vector<double> &parent1, const std::vector<double> &parent2, std::vector<double> &child1, std::vector<double> &child2)
+void SplitCrossover::operator()(const GENOME &parent1, const GENOME &parent2, GENOME &child1, GENOME &child2) const
 {
 	child1 = parent1;
 	child2 = parent2;
-	if ( RandFloat() < m_crossoverRate )
+	if ( RandFloat() < Rate )
 	{
-		int p1 = RandInt(0, parent1.size());
-		int p2 = RandInt(0, parent1.size());
-		
-		if ( m_splits.size() )
-		{
-			int t1 = RandInt(0, m_splits.size());
-			int t2 = RandInt(0, m_splits.size());
-			p1 = m_splits[t1];
-			p2 = m_splits[t2];
-		}
+		int t1 = RandInt(0, splits.size());
+		int t2 = RandInt(0, splits.size());
+		int p1 = splits[t1];
+		int p2 = splits[t2];
 
 		if ( p1>p2 ) std::swap(p1, p2);
 
-		for ( int i = p1; i<p2; ++i )
+		for ( int i = p1; i < p2; ++i )
 		{
-			std::swap(child1[i], child2[i]);
+			std::swap(child1.weights[i], child1.weights[i]);
 		}
 	}
 }
 
-void GeneticPopulation::Mutate(std::vector<double> &genome)
+const GENOME &RouletteSelector::operator()(const std::vector<GENOME> &population, const RelatedFitnessInfo &fitnessInfo) const
 {
-	for ( unsigned i = 0; i < genome.size(); ++i )
+	double slice = fitnessInfo.TotalFitness * RandFloat();
+	for ( unsigned i = 0; i<population.size(); ++i )
 	{
-		if ( RandFloat() < m_mutationRate )
+		if ( slice <= 0 ) return population[i];
+		slice -= population[i].fitness;
+	}
+	return population[population.size()-1];
+}
+
+void EliteKeeper::operator()(const std::vector<GENOME> &prev, std::vector<GENOME> &now) const
+{
+	for ( int i = 0; i<NumElite; ++i )
+	{
+		for ( int j = 0; j<NumCopiesPerElite; ++j )
 		{
-			genome[i] += RandClamped() * Params::MaxPerturbation;
+			now.push_back(prev[prev.size()-1-i]);
 		}
 	}
 }
 
-const GENOME &GeneticPopulation::GetChromoRoulette(void) const
-{
-	double slice = m_totalFitness * RandFloat();
-	double tmp = 0;
-	for ( unsigned i = 0; i<m_genes.size(); ++i )
-	{
-		if ( tmp >= slice ) return m_genes[i];
-		tmp += m_genes[i].m_fitness;
-	}
-	return m_genes[m_genes.size()-1];
 }
-
-void GeneticPopulation::GrabNBest(const std::vector<GENOME> &prev, std::vector<GENOME> &population, int _NumElite, int _NumCopiesElite)
-{
-	for ( ; _NumElite; --_NumElite )
-	{
-		for ( int i = _NumCopiesElite; i>0; --i )
-		{
-			population.push_back(prev[(m_size-1)-_NumElite]);
-		}
-	}
-}
-
-void GeneticPopulation::UpdateRelatedFitness(void)
-{
-	m_totalFitness = 0;
-	m_bestFitness = m_genes[0].m_fitness;
-	m_worstFitness = m_genes[0].m_fitness;
-
-	for ( unsigned i = 0; i<m_genes.size(); ++i )
-	{
-		m_totalFitness += m_genes[i].m_fitness;
-		if ( m_bestFitness < m_genes[i].m_fitness ) m_bestFitness = m_genes[i].m_fitness;
-		if ( m_worstFitness > m_genes[i].m_fitness ) m_worstFitness = m_genes[i].m_fitness;
-	}
-	m_averageFitness = m_totalFitness / m_genes.size();
-}
-
-GeneticPopulation::GeneticPopulation(int _size, int _numWeights, double _mutatteRate, double _crossoverRate) :
-	m_genes(std::vector<GENOME>()), m_size(_size), m_ChromoLength(_numWeights),
-	m_totalFitness(0), m_bestFitness(0), m_averageFitness(0), m_worstFitness(0),
-	m_fittestGenome(0),
-	m_mutationRate(_mutatteRate), m_crossoverRate(_crossoverRate),
-	m_generation(0), m_splits()
-{
-	for ( int i = 0; i<m_size; ++i )
-	{
-		m_genes.push_back(GENOME());
-		for ( int j = 0; j<m_ChromoLength; ++j )
-		{
-			m_genes[i].m_gene.push_back(RandClamped());
-		}
-	}
-}
-
-GeneticPopulation::~GeneticPopulation(void)
-{
-	// do nothing;
-}
-
-std::vector<GENOME> GeneticPopulation::Epoch(const std::vector<GENOME> &prev_pop)
-{
-	m_genes = prev_pop;
-
-	std::sort(m_genes.begin(), m_genes.end());
-
-	UpdateRelatedFitness();
-
-	std::vector<GENOME> NewGeneration;
-
-	if ( !(Params::NumCopiesElite * Params::NumElite % 2) )
-	{
-		GrabNBest(m_genes, NewGeneration, Params::NumElite, Params::NumCopiesElite);
-	}
-
-	while ( (int)(NewGeneration.size()) < m_size )
-	{
-		const GENOME &parent1 = GetChromoRoulette();
-		const GENOME &parent2 = GetChromoRoulette();
-
-		std::vector<double> child1, child2;
-
-		Crossover(parent1.m_gene, parent2.m_gene, child1, child2);
-
-		Mutate(child1);
-		Mutate(child2);
-
-		NewGeneration.push_back(GENOME(child1, 0));
-		NewGeneration.push_back(GENOME(child2, 0));
-	}
-
-	m_genes = NewGeneration;
-	++m_generation;
-	return m_genes;
-}
-
-std::vector<GENOME> GeneticPopulation::GetChromos(void) const
-{
-	return m_genes;
-}
-
-double GeneticPopulation::AverageFitness(void) const
-{
-	return m_averageFitness;
-}
-
-double GeneticPopulation::BestFitness(void) const
-{
-	return m_bestFitness;
-}
-
-int GeneticPopulation::Generation(void) const
-{
-	return m_generation;
-}
-
-void GeneticPopulation::SetSplits(const std::vector<int> &splits)
-{
-	m_splits = splits;
 }

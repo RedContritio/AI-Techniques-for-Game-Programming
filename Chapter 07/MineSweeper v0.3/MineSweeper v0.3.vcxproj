@@ -141,7 +141,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="CTimer.h" />
     <ClInclude Include="defines.h" />
-    <ClInclude Include="GeneticAlgorithms.h" />
+    <ClInclude Include="GeneticAlgorithms.hpp" />
     <ClInclude Include="LogSpawner.h" />
     <ClInclude Include="Matrix2d.h" />
     <ClInclude Include="MineSweeper.h" />
