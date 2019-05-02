@@ -1,5 +1,8 @@
 #include "Vector2d.h"
 #include "Matrix2d.h"
+#include "Params.h"
+#include "utils.hpp"
+
 #include <cmath>
 
 namespace RedContritio
@@ -63,7 +66,7 @@ double Vector2d::operator*(const Vector2d &rhs) const
 }
 double Vector2d::operator^(const Vector2d &rhs) const
 {
-	return x*rhs.y - y*rhs.x;
+	return x*rhs.y - y*rhs.x; // lhs ^ rhs == lhs cross rhs
 }
 double Vector2d::length(void) const
 {
@@ -118,4 +121,10 @@ int sign(const Vector2d &lhs, const Vector2d &rhs) // rhs ÔÚ lhs ÄæÊ±Õë
 	return (lhs^rhs) > 0 ? 1 : -1;
 }
 
+}
+
+using RedContritio::Utils::RandFloat;
+RedContritio::Vector2d GetRandomVector2d(void)
+{
+	return RedContritio::Vector2d(RandFloat()* Params::WindowWidth, RandFloat()* Params::WindowHeight);
 }

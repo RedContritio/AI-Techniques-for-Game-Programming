@@ -10,16 +10,24 @@ public:
 	static int WindowHeight;
 	static int FramesPerSecond;
 
-	static int NumInputs;
-	static int NumHiddenLayers;
-	static int NeuronsPerHiddenLayer;
-	static int NumOutputs;
+	static int NumSweeperInputs;
+	static int NumSweeperHiddenLayers;
+	static int SweeperNeuronsPerHiddenLayer;
+	static int NumSweeperOutputs;
+
+	static int NumKillerInputs;
+	static int NumKillerHiddenLayers;
+	static int KillerNeuronsPerHiddenLayer;
+	static int NumKillerOutputs;
 
 	static double ActivationResponse;
 	static double Bias;
 	
 	static double MaxTurnRate;
 	static double MaxSpeed;
+
+	static double KillerScale;
+	static int NumKillers;
 
 	static double SweeperScale;
 	static int NumSweepers;

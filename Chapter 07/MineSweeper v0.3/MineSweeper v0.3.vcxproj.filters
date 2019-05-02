@@ -51,6 +51,12 @@
     <ClCompile Include="Vector2d.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SweeperKiller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Mine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BufferLayer.h">
@@ -90,6 +96,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="GeneticAlgorithms.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SweeperKiller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Mine.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

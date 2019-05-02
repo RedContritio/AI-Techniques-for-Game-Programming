@@ -21,16 +21,16 @@ using RedContritio::GeneticAlgorithm::SplitCrossover;
 using RedContritio::GeneticAlgorithm::RouletteSelector;
 using RedContritio::GeneticAlgorithm::EliteKeeper;
 
-const Vector2d SweeperVertices[] = {Vector2d(4, 0.5), Vector2d(2, 0.5), Vector2d(2, 2), Vector2d(-2, 2),
-Vector2d(-2, -2), Vector2d(2, -2), Vector2d(2, -0.5), Vector2d(4, -0.5)};
+
 const Vector2d MineVertices[] = { Vector2d(1, 1), Vector2d(-1, 1), Vector2d(-1, -1), Vector2d(1, -1)};
 
 extern RedContritio::LogSpawner logger;
 
-void LocalSweeperPaint(HDC surface, const Matrix2d &mat);
 void LocalMinePaint(HDC surface, const Matrix2d &mat);
 
-auto GetRandomVector2d = [](void) -> Vector2d { return Vector2d(RandFloat()* Params::WindowWidth, RandFloat()* Params::WindowHeight); };
+template<typename ObjectType>
+void EasyEpoch(std::vector<ObjectType>& population);
+
 
 Controller::Controller(void) :
 	m_PenBlue(CreatePen(PS_SOLID, 1, RGB(0x00, 0x00, 0xFF))), m_PenGreen(CreatePen(PS_SOLID, 1, RGB(0x00, 0xFF, 0x00))),
@@ -40,15 +40,23 @@ Controller::Controller(void) :
 	m_BrushBlue(CreateSolidBrush(RGB(0x00, 0x00, 0xFF))), m_BrushRed(CreateSolidBrush(RGB(0xFF, 0x00, 0x00))),
 	m_BrushYellow(CreateSolidBrush(RGB(0x00, 0xFF, 0xFF))), m_BrushNULL(HBRUSH(GetStockObject(NULL_BRUSH))),
 	m_BrushOld(NULL),
-	m_numMines(Params::NumMines), m_numSweepers(Params::NumSweepers),
+	m_numKillers(Params::NumKillers), m_numMines(Params::NumMines), m_numSweepers(Params::NumSweepers),
 	m_cxClient(Params::WindowWidth), m_cyClient(Params::WindowHeight),
 	m_ticks(0), m_generation(0),
 	m_isPaused(false), m_isWatching(false),m_isFastIterating(false), m_isSlowIterating(false),
 	GenerateRandomSweeper([](void) -> MineSweeper {
-	return MineSweeper(RedContritio::NeuralNetwork::GenerateRandomNeuralNet(Params::NumInputs, Params::NumOutputs,
-																			Params::NumHiddenLayers, Params::NeuronsPerHiddenLayer)); }),
-	m_SweeperPainter(LocalSweeperPaint), m_MinePainter(LocalMinePaint)
+	return MineSweeper(RedContritio::NeuralNetwork::GenerateRandomNeuralNet(Params::NumSweeperInputs, Params::NumSweeperOutputs,
+																			Params::NumSweeperHiddenLayers, Params::SweeperNeuronsPerHiddenLayer)); }),
+	GenerateRandomKiller([](void) -> SweeperKiller {
+		return SweeperKiller(RedContritio::NeuralNetwork::GenerateRandomNeuralNet(Params::NumKillerInputs, Params::NumKillerOutputs,
+			Params::NumKillerHiddenLayers, Params::KillerNeuronsPerHiddenLayer)); }),
+	m_MinePainter(LocalMinePaint)
 {
+	for ( int i = 0; i < Params::NumKillers; ++i )
+	{
+		m_killers.push_back(GenerateRandomKiller());
+	}
+
 	for ( int i = 0; i < Params::NumSweepers; ++i )
 	{
 		m_sweepers.push_back(GenerateRandomSweeper());
@@ -103,17 +111,30 @@ void Controller::Render(HDC surface)
 	for ( unsigned i = 0; i<m_sweepers.size(); ++i )
 	{
 		const MineSweeper &sweeper = m_sweepers[i];
-		Matrix2d tmat(sweeper.GetTransformMatrix());
 
-		Ellipse(surface, (int) (sweeper.Position().x - 2), (int) (sweeper.Position().y - 2),
-			(int) (sweeper.Position().x + 2), (int) (sweeper.Position().y + 2));
 		if ( m_isWatching )
 		{
 			MoveToEx(surface, (int) (sweeper.Position().x), (int) (sweeper.Position().y), NULL);
 			LineTo(surface, (int) (m_mines[sweeper.GetClosestMine()].x), (int) (m_mines[sweeper.GetClosestMine()].y));
 		}
 		
-		m_SweeperPainter(surface, tmat);
+		sweeper.Render(surface);
+		if ( i == Params::NumElite * Params::NumCopiesElite ) SelectObject(surface, m_PenOld);
+	}
+
+	SelectObject(surface, m_PenRed);
+	for ( unsigned i = 0; i<m_killers.size(); ++i )
+	{
+		const SweeperKiller &killer = m_killers[i];
+
+		if ( m_isWatching )
+		{
+			MoveToEx(surface, (int) (killer.Position().x), (int) (killer.Position().y), NULL);
+			LineTo(surface, (int) (m_sweepers[killer.GetClosestSweeper()].Position().x),
+				(int) (m_sweepers[killer.GetClosestSweeper()].Position().y));
+		}
+
+		killer.Render(surface);
 		if ( i == Params::NumElite * Params::NumCopiesElite ) SelectObject(surface, m_PenOld);
 	}
 
@@ -143,55 +164,36 @@ bool Controller::Update(void)
 					this->resetMine(MineID);
 				}
 			}
+
+			for ( int i = 0; i<m_numKillers; ++i )
+			{
+				bool res = m_killers[i].Update(m_sweepers);
+				if ( !res )
+				{
+					logger.printf("ERROR: Illegal Update, when m_killer[%d] is updating.\n", i);
+				}
+				int SweeperID = m_killers[i].CheckCollision(m_sweepers);
+				if ( SweeperID != SweeperKiller::CollisionFailed )
+				{
+					m_killers[i].IncreaseFitness();
+					m_sweepers[SweeperID].Reset();
+				}
+			}
 		}
 		else
 		{
 			// TODO: ¸´Î»²Ù×÷
 			m_ticks = 0;
 			resetMine();
-			std::vector<GENOME> prev;
-			for ( unsigned i = 0; i<m_sweepers.size(); ++i )
-			{
-				prev.push_back(GENOME(m_sweepers[i].GetWeights(), m_sweepers[i].Fitness()));
-			}
 
-			std::vector<GENOME> nextGene;
+			EasyEpoch(m_sweepers);
+			EasyEpoch(m_killers);
 
-			RelatedFitnessInfo info;
-
-			RedContritio::GeneticAlgorithm::Epoch(prev, nextGene, &info, Mutator(Params::MutationRate),
-				SplitCrossover(Params::CrossoverRate, m_sweepers[0].GetSplits()), RouletteSelector(),
-				EliteKeeper(Params::NumElite, Params::NumCopiesElite));
-
-			logger.printf("interating...\n->generation[%02d]: best: %d ,average: %d\n", m_generation,
-				info.BestFitness, info.AverageFitness);
-
-			for ( unsigned i = 0; i<m_sweepers.size(); ++i )
-			{
-				m_sweepers[i].Reset();
-				m_sweepers[i].PutWeights(nextGene[i].weights);
-			}
 			++m_generation;
 		}
 	}
 	return true;
 }
-
-void LocalSweeperPaint(HDC surface, const Matrix2d &mat)
-{
-	const int NumVertices = sizeof(SweeperVertices)/sizeof(*SweeperVertices);
-	std::vector<Vector2d> shape;
-	for ( unsigned i = 0; i < NumVertices; ++i )
-	{
-		shape.push_back(SweeperVertices[i] * mat);
-	}
-
-	MoveToEx(surface, (int) (shape[NumVertices-1].x), (int) (shape[NumVertices-1].y), NULL);
-	for ( unsigned i = 0; i < NumVertices; ++i )
-	{
-		LineTo(surface, (int) (shape[i].x), (int) (shape[i].y));
-	}
-};
 
 void LocalMinePaint(HDC surface, const Matrix2d &mat)
 {
@@ -267,7 +269,7 @@ void Controller::SaveElites(const char *_FileName) const
 		SaveFile.printf("[ID: %d ]\n", i);
 		const MineSweeper &sweeper = m_sweepers[i*Params::NumCopiesElite];
 		SaveFile.printf("inputs: %d ,outputs: %d ,hiddenLayers: %d ,NeuronsPerLayer: %d\n",
-			Params::NumInputs, Params::NumOutputs, Params::NumHiddenLayers, Params::NeuronsPerHiddenLayer);
+			Params::NumSweeperInputs, Params::NumSweeperOutputs, Params::NumSweeperHiddenLayers, Params::SweeperNeuronsPerHiddenLayer);
 		std::vector<double> weights(sweeper.GetWeights());
 		for ( unsigned i = 0; i<weights.size(); ++i )
 		{
@@ -276,4 +278,28 @@ void Controller::SaveElites(const char *_FileName) const
 		SaveFile.printf("\n");
 	}
 	SaveFile.printf("\n");
+}
+
+template<typename ObjectType>
+void EasyEpoch(std::vector<ObjectType> &population)
+{
+	std::vector<GENOME> prev;
+	for ( unsigned i = 0; i<population.size(); ++i )
+	{
+		prev.push_back(GENOME(population[i].GetWeights(), population[i].Fitness()));
+	}
+
+	std::vector<GENOME> nextGene;
+
+	RelatedFitnessInfo info;
+
+	RedContritio::GeneticAlgorithm::Epoch(prev, nextGene, &info, Mutator(Params::MutationRate),
+		SplitCrossover(Params::CrossoverRate, population[0].GetSplits()), RouletteSelector(),
+		EliteKeeper(Params::NumElite, Params::NumCopiesElite));
+
+	for ( unsigned i = 0; i<population.size(); ++i )
+	{
+		population[i].Reset();
+		population[i].PutWeights(nextGene[i].weights);
+	}
 }

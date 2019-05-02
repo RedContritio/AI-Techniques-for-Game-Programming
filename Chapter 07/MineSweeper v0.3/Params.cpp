@@ -43,16 +43,24 @@ bool Params::LoadInParameters(const char *_FileName)
 
 	LoadParameter(FramesPerSecond, "%d");
 
-	LoadParameter(NumInputs, "%d");
-	LoadParameter(NumHiddenLayers, "%d");
-	LoadParameter(NeuronsPerHiddenLayer, "%d");
-	LoadParameter(NumOutputs, "%d");
+	LoadParameter(NumSweeperInputs, "%d");
+	LoadParameter(NumSweeperHiddenLayers, "%d");
+	LoadParameter(SweeperNeuronsPerHiddenLayer, "%d");
+	LoadParameter(NumSweeperOutputs, "%d");
+
+	LoadParameter(NumKillerInputs, "%d");
+	LoadParameter(NumKillerHiddenLayers, "%d");
+	LoadParameter(KillerNeuronsPerHiddenLayer, "%d");
+	LoadParameter(NumKillerOutputs, "%d");
 
 	LoadParameter(ActivationResponse, "%lf");
 	LoadParameter(Bias, "%lf");
 
 	LoadParameter(MaxTurnRate, "%lf");
 	LoadParameter(MaxSpeed, "%lf");
+
+	LoadParameter(KillerScale, "%lf");
+	LoadParameter(NumKillers, "%d");
 
 	LoadParameter(SweeperScale, "%lf");
 	LoadParameter(NumSweepers, "%d");
@@ -82,16 +90,24 @@ int Params::WindowHeight = 0;
 
 int Params::FramesPerSecond = 0;
 
-int Params::NumInputs = 0;
-int Params::NumHiddenLayers = 0;
-int Params::NeuronsPerHiddenLayer = 0;
-int Params::NumOutputs = 0;
+int Params::NumSweeperInputs = 0;
+int Params::NumSweeperHiddenLayers = 0;
+int Params::SweeperNeuronsPerHiddenLayer = 0;
+int Params::NumSweeperOutputs = 0;
+
+int Params::NumKillerInputs = 0;
+int Params::NumKillerHiddenLayers = 0;
+int Params::KillerNeuronsPerHiddenLayer = 0;
+int Params::NumKillerOutputs = 0;
 
 double Params::ActivationResponse = 0;
 double Params::Bias = 0;
 
 double Params::MaxTurnRate = 0;
 double Params::MaxSpeed = 0;
+
+double Params::KillerScale = 1;
+int Params::NumKillers = 0;
 
 double Params::SweeperScale = 1;
 int Params::NumSweepers = 0;

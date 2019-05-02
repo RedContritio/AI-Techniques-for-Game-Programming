@@ -38,6 +38,8 @@ struct _GENOME_base
 
 typedef _GENOME_base<double> GENOME;
 
+// std::function
+
 template<typename T, typename Func1, typename Func2, typename Func3, typename Func4>
 void Epoch(const std::vector<_GENOME_base<T> > &prev, std::vector<_GENOME_base<T> > &now, RelatedFitnessInfo *fitnessInfo, Func1 Mutate, Func2 Crossover, Func3 Select, Func4 Initialize)
 {

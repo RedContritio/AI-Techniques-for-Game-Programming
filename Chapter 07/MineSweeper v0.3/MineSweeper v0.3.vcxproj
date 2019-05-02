@@ -130,10 +130,12 @@
     <ClCompile Include="LogSpawner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix2d.cpp" />
+    <ClCompile Include="Mine.cpp" />
     <ClCompile Include="MineSweeper.cpp" />
     <ClCompile Include="NeuralNet.cpp" />
     <ClCompile Include="Params.cpp" />
     <ClCompile Include="StandardWindow.cpp" />
+    <ClCompile Include="SweeperKiller.cpp" />
     <ClCompile Include="Vector2d.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -144,10 +146,12 @@
     <ClInclude Include="GeneticAlgorithms.hpp" />
     <ClInclude Include="LogSpawner.h" />
     <ClInclude Include="Matrix2d.h" />
+    <ClInclude Include="Mine.h" />
     <ClInclude Include="MineSweeper.h" />
     <ClInclude Include="NeuralNet.h" />
     <ClInclude Include="Params.h" />
     <ClInclude Include="StandardWindow.h" />
+    <ClInclude Include="SweeperKiller.h" />
     <ClInclude Include="utils.hpp" />
     <ClInclude Include="Vector2d.h" />
   </ItemGroup>

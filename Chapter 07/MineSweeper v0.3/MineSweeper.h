@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <windows.h>
+
 const int MINESWEEPER_COLLISION_FAILED = -1;
 
 class MineSweeper
@@ -27,6 +29,7 @@ public:
 	MineSweeper(const RedContritio::NeuralNetwork::NeuralNet &brain);
 	~MineSweeper(void);
 	bool Update(const std::vector<RedContritio::Vector2d> &mines);
+	void Render(HDC surface) const;
 	void Reset(void);
 
 	void IncreaseFitness(void);
@@ -48,6 +51,8 @@ public:
 	RedContritio::Matrix2d GetTransformMatrix(void) const;
 	static const int CollisionSize = 2;
 	static const int CollisionFailed = -1;
+
+	friend class SweeperKiller;
 };
 
 RedContritio::Vector2d VectorDifferenceInWorld(RedContritio::Vector2d v1, RedContritio::Vector2d v2, RedContritio::Vector2d worldsize);

@@ -50,4 +50,6 @@ int sign(const Vector2d& lhs, const Vector2d& rhs);
 
 }
 
+RedContritio::Vector2d GetRandomVector2d(void);
+
 #endif

@@ -2,6 +2,7 @@
 #define _CONTROLLER_INC
 #pragma once
 
+#include "SweeperKiller.h"
 #include "MineSweeper.h"
 #include "Vector2d.h"
 #include "Matrix2d.h"
@@ -17,9 +18,11 @@
 class Controller
 {
 private:
+	std::vector<SweeperKiller> m_killers;
 	std::vector<MineSweeper> m_sweepers;
 	std::vector<RedContritio::Vector2d> m_mines;
 
+	int m_numKillers;
 	int m_numSweepers;
 	int m_numMines;
 	
@@ -40,7 +43,8 @@ private:
 	bool m_isFastIterating, m_isSlowIterating;
 	bool m_isWatching;
 
-	std::function<MineSweeper (void)> GenerateRandomSweeper;
+	std::function<MineSweeper(void)> GenerateRandomSweeper;
+	std::function<SweeperKiller(void)> GenerateRandomKiller;
 
 	void resetMine(int id);
 	void resetMine(void);

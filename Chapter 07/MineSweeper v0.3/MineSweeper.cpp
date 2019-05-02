@@ -23,10 +23,8 @@ using RedContritio::Matrix2d;
 
 extern RedContritio::LogSpawner logger;
 
-inline Vector2d RandVector2d(double left, double top, double right, double bottom)
-{
-	return Vector2d(left + RandFloat() * (right - left), top + RandFloat() * (bottom - top));
-}
+const Vector2d SweeperVertices[] = { Vector2d(4, 0.5), Vector2d(2, 0.5), Vector2d(2, 2), Vector2d(-2, 2),
+Vector2d(-2, -2), Vector2d(2, -2), Vector2d(2, -0.5), Vector2d(4, -0.5) };
 
 inline void CirculantWarp(double &value, double left, double right)
 {
@@ -39,14 +37,14 @@ MineSweeper::MineSweeper(void) :m_brain(),
 m_position(), m_lookat(), m_rotation(), m_speed(), m_lTrack(MaxTrackSpeed), m_rTrack(MaxTrackSpeed),
 m_fitness(), m_closestMine(0)
 {
-	m_position = RandVector2d(0, 0, Params::WindowWidth, Params::WindowHeight);
+	m_position = GetRandomVector2d();
 }
 
 MineSweeper::MineSweeper(const RedContritio::NeuralNetwork::NeuralNet &brain) : m_brain(brain),
 m_position(), m_lookat(), m_rotation(), m_speed(), m_lTrack(MaxTrackSpeed), m_rTrack(MaxTrackSpeed),
 m_fitness(), m_closestMine(0)
 {
-	m_position = RandVector2d(0, 0, Params::WindowWidth, Params::WindowHeight);
+	m_position = GetRandomVector2d();
 }
 
 
@@ -69,7 +67,7 @@ bool MineSweeper::Update(const std::vector<Vector2d> &mines)
 	inputs.push_back(angle);
 
 	std::vector<double> outputs(m_brain.Update(inputs));
-	if ( outputs.size() < (unsigned)(Params::NumOutputs) )
+	if ( outputs.size() < (unsigned)(Params::NumSweeperOutputs) )
 	{
 		return false;
 	}
@@ -91,9 +89,30 @@ bool MineSweeper::Update(const std::vector<Vector2d> &mines)
 	return true;
 }
 
+
+void MineSweeper::Render(HDC surface) const
+{
+	static const int NumVertices = sizeof(SweeperVertices)/sizeof(*SweeperVertices);
+	Ellipse(surface, (int) (m_position.x - 2), (int) (m_position.y - 2),
+		(int) (m_position.x + 2), (int) (m_position.y + 2));
+
+	Matrix2d mat(GetTransformMatrix());
+	std::vector<Vector2d> shape;
+	for ( unsigned i = 0; i < NumVertices; ++i )
+	{
+		shape.push_back(SweeperVertices[i] * mat);
+	}
+
+	MoveToEx(surface, (int) (shape[NumVertices-1].x), (int) (shape[NumVertices-1].y), NULL);
+	for ( unsigned i = 0; i < NumVertices; ++i )
+	{
+		LineTo(surface, (int) (shape[i].x), (int) (shape[i].y));
+	}
+}
+
 void MineSweeper::Reset(void)
 {
-	m_position = RandVector2d(0, 0, Params::WindowWidth, Params::WindowHeight);
+	m_position = GetRandomVector2d();
 	m_fitness = 0;
 	m_rotation = RandFloat(0, 2*Params::PI);
 	return;
